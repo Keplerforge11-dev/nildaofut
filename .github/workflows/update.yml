@@ -2,7 +2,7 @@ name: Atualizar jogos
 
 on:
   schedule:
-    - cron: "17 */2 * * *" # de 2 em 2 horas
+    - cron: "7,37 12-23,0-3 * * *" # de meia em meia hora, das 9h à 0h30 (horário de Brasília)
   workflow_dispatch: # botão "Run workflow" na aba Actions
 
 permissions:
