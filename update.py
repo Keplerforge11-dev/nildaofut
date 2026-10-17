@@ -3,20 +3,23 @@
 
 Roda sozinho no GitHub (veja .github/workflows/update.yml) e atualiza o arquivo data.json:
   - jogos, placares e tabela do Brasileirão: football-data.org (gratuito, precisa da chave FOOTBALL_DATA_KEY)
-  - canais de transmissão: tabela do blog da Claro
-  - notícias dos times: feed RSS da Gazeta Esportiva
+  - canais de transmissão do Brasileirão: tabela do blog da Claro
+  - Libertadores, Sul-Americana e Copa do Brasil: páginas dos campeonatos da Gazeta Esportiva
+  - notícias dos times: feed RSS de cada time na Gazeta Esportiva
 
 Regra de ouro: se uma fonte falhar ou mudar de formato, os dados antigos ficam como estavam
 e o app nunca mostra uma tela vazia. O aviso aparece na página da execução no GitHub.
 """
+import html
 import json
 import os
 import re
 import sys
+import time
 import unicodedata
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timedelta
 from email.utils import parsedate_to_datetime
 from html.parser import HTMLParser
 from zoneinfo import ZoneInfo
@@ -27,11 +30,26 @@ DATA_FILE = "data.json"
 DEBUG_DIR = "debug"
 API = "https://api.football-data.org/v4/competitions/BSA"
 CLARO_URL = "https://www.claro.com.br/blog/tv/brasileirao"
-FEED_URL = "https://www.gazetaesportiva.com/feedrss/"
-GAZETA_COPAS = {
-    "libertadores": "https://www.gazetaesportiva.com/campeonatos/libertadores-da-america/",
-    "sulamericana": "https://www.gazetaesportiva.com/campeonatos/copa-sulamericana/",
-    "copa-do-brasil": "https://www.gazetaesportiva.com/campeonatos/copa-do-brasil/",
+CLARO_BASE = "https://www.claro.com.br/blog/tv/"
+GAZETA = "https://www.gazetaesportiva.com/"
+COPAS = [
+    ("sa-lib", GAZETA + "campeonatos/libertadores-da-america/"),
+    ("sa-sul", GAZETA + "campeonatos/copa-sulamericana/"),
+    ("br-copa", GAZETA + "campeonatos/copa-do-brasil/"),
+]
+# endereços que o blog da Claro pode usar para as copas (só guardo uma cópia para eu conferir)
+CLARO_COPAS = {
+    "libertadores": ["libertadores", "copa-libertadores"],
+    "sulamericana": ["sul-americana", "copa-sul-americana", "sulamericana"],
+    "copa-do-brasil": ["copa-do-brasil"],
+}
+# time -> nome do feed na Gazeta (Mirassol e Remo não têm feed)
+FEEDS = {
+    "Atlético-MG": "atletico-mg", "Athletico-PR": "atletico-pr", "Bahia": "bahia", "Botafogo": "botafogo",
+    "Red Bull Bragantino": "bragantino", "Chapecoense": "chapecoense", "Corinthians": "corinthians",
+    "Coritiba": "coritiba", "Cruzeiro": "cruzeiro", "Flamengo": "flamengo", "Fluminense": "fluminense",
+    "Grêmio": "gremio", "Internacional": "inter-rs", "Palmeiras": "palmeiras", "Santos": "santos",
+    "São Paulo": "sao-paulo", "Vasco": "vasco", "Vitória": "vitoria",
 }
 
 # nome usado no app, palavras que identificam o time (sem acento, minúsculas)
@@ -57,8 +75,6 @@ CLUBS = [
     ("Remo", ["remo"]),
     ("Chapecoense", ["chapecoense"]),
 ]
-# nomes que também são palavras comuns: não servem para achar time pelo título de uma notícia
-AMBIGUOS = {"Bahia", "Vitória", "Internacional", "Remo"}
 
 CANAIS = {
     "globo": "TV Globo", "tv globo": "TV Globo", "sportv": "SporTV", "premiere": "Premiere",
@@ -94,9 +110,19 @@ def contem(n, kw):
 
 
 def canon(name):
+    """Acha o time do app dentro de um nome longo (ex.: 'CR Flamengo')."""
     n = norm(name)
     for app, kws in CLUBS:
         if any(contem(n, k) for k in kws):
+            return app
+    return None
+
+
+def canon_exato(name):
+    """Só aceita o nome quando ele é o do time (evita confundir 'Santos Laguna' com o Santos)."""
+    n = norm(name)
+    for app, kws in CLUBS:
+        if n == norm(app) or n in kws:
             return app
     return None
 
@@ -111,9 +137,9 @@ def nome_time(t):
     return raw
 
 
-def guardar_copia(nome, corpo):
+def guardar_copia(arquivo, corpo):
     """Guarda uma cópia da página para eu conferir o formato quando uma fonte muda."""
-    caminho = os.path.join(DEBUG_DIR, nome + ".html")
+    caminho = os.path.join(DEBUG_DIR, arquivo)
     if os.path.exists(caminho) and not os.environ.get("REFRESH_DEBUG"):
         return
     os.makedirs(DEBUG_DIR, exist_ok=True)
@@ -204,7 +230,7 @@ def limpar_canais(txt):
 
 def buscar_canais():
     corpo = get(CLARO_URL)
-    guardar_copia("claro", corpo)
+    guardar_copia("claro.html", corpo)
     p = Linhas()
     p.feed(corpo)
     mapa = {}
@@ -219,55 +245,123 @@ def buscar_canais():
     return mapa
 
 
-# ---------- Notícias: feed da Gazeta Esportiva ----------
-def times_da_noticia(titulo, url):
-    achados = set()
-    m = re.search(r"/times/([a-z0-9-]+)/", url)
-    if m:
-        c = canon(m.group(1).replace("-", " "))
-        if c:
-            achados.add(c)
-    n = norm(titulo)
-    for app, kws in CLUBS:
-        if app not in AMBIGUOS and any(contem(n, k) for k in kws):
-            achados.add(app)
-    return achados
-
-
-def buscar_noticias(antigas):
-    corpo = get(FEED_URL)
-    guardar_copia("feed", corpo)
-    raiz = ET.fromstring(corpo.encode("utf-8"))
-    itens = list(raiz.iter("item"))
-    if not itens:
-        raise ValueError("feed sem notícias")
-    noticias = {k: list(v) for k, v in antigas.items()}
-    for it in itens:
-        titulo = (it.findtext("title") or "").strip()
-        url = (it.findtext("link") or "").strip()
-        if not titulo or not url:
+def guardar_paginas_claro_das_copas():
+    """Tenta achar páginas de canais das copas no blog da Claro e guarda uma cópia, sem usar os dados ainda."""
+    for nome, slugs in CLARO_COPAS.items():
+        arquivo = "claro-%s.html" % nome
+        if os.path.exists(os.path.join(DEBUG_DIR, arquivo)):
             continue
-        try:
-            dt = parsedate_to_datetime(it.findtext("pubDate")).astimezone(TZ)
-        except Exception:
-            dt = datetime.now(TZ)
-        n = {"t": titulo, "d": dt.strftime("%d/%m/%Y"), "u": url, "ts": int(dt.timestamp())}
-        for clube in times_da_noticia(titulo, url):
-            atual = {x["u"]: x for x in noticias.get(clube, [])}
-            atual[url] = n
-            noticias[clube] = sorted(atual.values(), key=lambda x: x["ts"], reverse=True)[:5]
-    return noticias
+        for slug in slugs:
+            try:
+                corpo = get(CLARO_BASE + slug)
+            except Exception:
+                continue
+            if len(corpo) > 5000:
+                guardar_copia(arquivo, corpo)
+                print("página da Claro encontrada:", slug)
+                break
 
 
-# ---------- Copas: guarda uma cópia das páginas da Gazeta para eu ajustar a leitura ----------
-def copiar_paginas_das_copas():
-    for nome, url in GAZETA_COPAS.items():
-        if os.path.exists(os.path.join(DEBUG_DIR, nome + ".html")) and not os.environ.get("REFRESH_DEBUG"):
+# ---------- Copas: páginas dos campeonatos da Gazeta Esportiva ----------
+RE_JOGO = re.compile(r'<a [^>]*class="campeonato-mata-mata__jogo"[^>]*>(.*?)</a>', re.S)
+RE_DATA = re.compile(r'<span class="date">\s*(\d{2})/(\d{2})\s+(\d{2}):(\d{2})\s*<b>.*?</b>\s*(.*?)\s*</span>', re.S)
+RE_CASA = re.compile(r'class="equipe-mandante">.*?<span>([^<]+)</span>', re.S)
+RE_FORA = re.compile(r'class="equipe-visitante">.*?<span>([^<]+)</span>', re.S)
+RE_PCASA = re.compile(r'class="placar__home">([^<]*)<')
+RE_PFORA = re.compile(r'class="placar__visitante">([^<]*)<')
+
+
+def nome_copa(raw):
+    raw = html.unescape(raw).strip()
+    return canon_exato(raw) or raw
+
+
+def ler_copa(campeonato, corpo, agora):
+    jogos = []
+    for bloco in RE_JOGO.findall(corpo):
+        d, c, f = RE_DATA.search(bloco), RE_CASA.search(bloco), RE_FORA.search(bloco)
+        if not (d and c and f):
             continue
+        dia, mes, hora, minuto = (int(x) for x in d.groups()[:4])
+        ano = agora.year
+        dt = datetime(ano, mes, dia, hora, minuto, tzinfo=TZ)
+        if dt < agora - timedelta(days=200):
+            dt = dt.replace(year=ano + 1)
+        elif dt > agora + timedelta(days=200):
+            dt = dt.replace(year=ano - 1)
+        g = {
+            "c": campeonato,
+            "date": dt.strftime("%Y-%m-%d"),
+            "t": dt.strftime("%H:%M"),
+            "h": nome_copa(c.group(1)),
+            "a": nome_copa(f.group(1)),
+            "tv": "",
+            "v": html.unescape(d.group(5)).strip(),
+        }
+        pc, pf = RE_PCASA.search(bloco), RE_PFORA.search(bloco)
+        if pc and pf and pc.group(1).strip().isdigit() and pf.group(1).strip().isdigit() and dt + timedelta(minutes=100) < agora:
+            g["s"] = [int(pc.group(1)), int(pf.group(1))]
+        jogos.append(g)
+    return jogos
+
+
+def buscar_copas():
+    agora = datetime.now(TZ)
+    novos, ok = [], 0
+    for campeonato, url in COPAS:
         try:
-            guardar_copia(nome, get(url))
+            jogos = ler_copa(campeonato, get(url), agora)
+            if not jogos:
+                raise ValueError("nenhum jogo reconhecido na página")
+            novos += jogos
+            ok += 1
         except Exception as e:
-            aviso("não consegui copiar a página %s: %s" % (nome, e))
+            aviso("copa %s não atualizou, mantive os dados antigos: %s" % (campeonato, e))
+    return novos, ok
+
+
+def mesclar_copas(antigos, novos):
+    por_jogo = {(g["c"], g["h"], g["a"]): g for g in antigos}
+    for g in novos:
+        antigo = por_jogo.get((g["c"], g["h"], g["a"]), {})
+        g["tv"] = g["tv"] or antigo.get("tv", "")
+        por_jogo[(g["c"], g["h"], g["a"])] = g
+    return list(por_jogo.values())
+
+
+# ---------- Notícias: feed RSS de cada time na Gazeta Esportiva ----------
+def buscar_noticias(antigas):
+    noticias = {k: list(v) for k, v in antigas.items()}
+    ok, falhas = 0, []
+    for clube, slug in FEEDS.items():
+        try:
+            corpo = get("%stimes/%s/feed/" % (GAZETA, slug))
+            if clube == "Santos":
+                guardar_copia("feed-santos.xml", corpo)
+            itens = list(ET.fromstring(corpo.encode("utf-8")).iter("item"))
+            if not itens:
+                raise ValueError("feed vazio")
+            atual = {x["u"]: x for x in noticias.get(clube, [])}
+            for it in itens:
+                titulo = html.unescape((it.findtext("title") or "").strip())
+                url = (it.findtext("link") or "").strip()
+                if not titulo or not url:
+                    continue
+                try:
+                    dt = parsedate_to_datetime(it.findtext("pubDate")).astimezone(TZ)
+                except Exception:
+                    dt = datetime.now(TZ)
+                atual[url] = {"t": titulo, "d": dt.strftime("%d/%m/%Y"), "u": url, "ts": int(dt.timestamp())}
+            noticias[clube] = sorted(atual.values(), key=lambda x: x["ts"], reverse=True)[:5]
+            ok += 1
+        except Exception as e:
+            falhas.append("%s: %s" % (clube, e))
+        time.sleep(0.4)
+    if ok == 0:
+        raise ValueError("nenhum feed de time respondeu (%s)" % "; ".join(falhas[:2]))
+    if falhas:
+        aviso("%d feeds de times falharam, por exemplo %s" % (len(falhas), falhas[0]))
+    return noticias
 
 
 def carregar():
@@ -296,6 +390,7 @@ def main():
     jogos_antes = antes.get("games", [])
     chave = os.environ.get("FOOTBALL_DATA_KEY", "").strip()
 
+    # Brasileirão
     novos = None
     if not chave:
         status["brasileirao"] = "sem chave"
@@ -323,23 +418,26 @@ def main():
             c, o = canais.get(k, {}), velhos.get(k, {})
             g["tv"] = c.get("tv") or o.get("tv", "")
             g["v"] = c.get("v") or g.get("v") or o.get("v", "")
-        sem_canal = [g for g in novos if "s" not in g and not g["tv"] and g["date"] >= datetime.now(TZ).strftime("%Y-%m-%d")]
-        if sem_canal and status["canais"] == "ok":
-            print("jogos futuros sem canal na fonte:", len(sem_canal))
-        jogos = novos + [g for g in jogos_antes if g["c"] != "br-a"]
+        brasileirao = novos
     else:
-        jogos = jogos_antes
-    dados["games"] = sorted(jogos, key=lambda g: (g["date"], g["t"]))
+        brasileirao = [g for g in jogos_antes if g["c"] == "br-a"]
 
+    # Copas
+    copas_antes = [g for g in jogos_antes if g["c"] != "br-a"]
+    novas, ok = buscar_copas()
+    copas = mesclar_copas(copas_antes, novas) if novas else copas_antes
+    status["copas"] = "ok" if ok == len(COPAS) else ("parcial" if ok else "erro")
+    guardar_paginas_claro_das_copas()
+
+    dados["games"] = sorted(brasileirao + copas, key=lambda g: (g["date"], g["t"]))
+
+    # Notícias
     try:
         dados["news"] = buscar_noticias(antes.get("news", {}))
         status["noticias"] = "ok"
     except Exception as e:
         status["noticias"] = "erro"
         aviso("notícias não atualizaram, mantive as antigas: %s" % e)
-
-    copiar_paginas_das_copas()
-    status.setdefault("copas", "manual")
 
     dados["updated"] = datetime.now(TZ).isoformat(timespec="minutes")
     dados["status"] = status
