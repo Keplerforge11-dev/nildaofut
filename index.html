@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A0A09">
+<title>NildãoFut</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+body { margin: 0; }
+[hidden] { display: none !important; }
+img { max-width: 100%; }
+/* Layout: uma coluna estreita, letra grande, três telas (Jogos, Meu time, Campeonatos) numa barra fixa embaixo. Visual único: preto e dourado. */
+:root {
+  --bg: #0A0A09;
+  --surface: #151412;
+  --surface-2: #1F1C16;
+  --ink: #F6F1E3;
+  --muted: #C7BDA2;
+  --line: #3B3527;
+  --gold: #E2B33A;
+  --gold-hi: #F4CF63;
+  --on-gold: #130F00;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: "Archivo Black", "Arial Black", Impact, sans-serif;
+  --scale: 1;
+  color-scheme: dark;
+}
+
+html { font-size: calc(20px * var(--scale)); }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 1rem; line-height: 1.45;
+  padding-block: 0.75rem 7rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 40rem; margin: 0 auto; display: flex; flex-direction: column; gap: 1.25rem; }
+.stack { display: flex; flex-direction: column; gap: 0.7rem; }
+button { font: inherit; color: inherit; cursor: pointer; }
+a { color: inherit; }
+:focus-visible { outline: 4px solid var(--gold-hi); outline-offset: 2px; }
+
+header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; padding-bottom: 0.9rem; border-bottom: 3px solid var(--gold); }
+.logo { font-family: var(--font-display); font-size: 1.7rem; line-height: 1.1; letter-spacing: -0.01em; }
+.logo span { color: var(--gold); }
+.brand { display: flex; align-items: center; gap: 0.75rem; }
+.avatar { flex: none; width: 3.4rem; height: 3.4rem; border-radius: 50%; border: 3px solid var(--gold); background: var(--surface-2) url("nildao.png") 50% 9% / 130% auto no-repeat; }
+.mascot { display: flex; align-items: flex-end; gap: 0.7rem; }
+.mascot img { flex: none; height: auto; }
+.bubble { position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.25rem; background: var(--surface-2); border: 2px solid var(--gold); border-radius: 1rem; padding: 0.8rem 1rem; font-size: 1.1rem; margin-bottom: 1.6rem; }
+.bubble b { font-family: var(--font-display); font-weight: 400; color: var(--gold); }
+.bubble::before { content: ""; position: absolute; left: -11px; bottom: 1.2rem; width: 18px; height: 18px; background: var(--surface-2); border-left: 2px solid var(--gold); border-bottom: 2px solid var(--gold); transform: rotate(45deg); }
+.size-btn { min-height: 3rem; padding: 0.4rem 1rem; border-radius: 0.75rem; background: transparent; border: 2px solid var(--gold); color: var(--gold); font-weight: 700; }
+
+h1 { font-family: var(--font-display); font-size: 1.5rem; line-height: 1.15; text-wrap: balance; margin: 0; }
+h2.sec { font-family: var(--font-display); font-size: 1.05rem; margin: 0.4rem 0 0; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gold); }
+.lead { margin: 0.25rem 0 0; color: var(--muted); font-size: 1.05rem; }
+
+.note { border: 2px dashed var(--line); border-radius: 0.75rem; padding: 0.7rem 0.9rem; color: var(--muted); font-size: 0.9rem; margin: 0; }
+
+.seg { display: flex; gap: 0.4rem; }
+.seg button { flex: 1; min-width: 0; min-height: 3.2rem; border-radius: 0.8rem; border: 2px solid var(--line); background: var(--surface); font-weight: 700; font-size: 17px; padding: 0.2rem 0.3rem; }
+.seg button[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--on-gold); }
+@media (max-width: 380px) { .seg button, nav button { font-size: 15px; } }
+
+.day { display: flex; flex-direction: column; gap: 0.6rem; }
+.day-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; padding-top: 0.6rem; }
+.badge { background: var(--gold); color: var(--on-gold); font-weight: 700; padding: 0.1rem 0.7rem; border-radius: 99px; letter-spacing: 0.04em; font-size: 0.95rem; }
+.day-name { font-weight: 700; font-size: 1.15rem; }
+
+.game { background: var(--surface); border: 2px solid var(--line); border-radius: 1rem; padding: 0.9rem 1rem; display: flex; flex-direction: column; gap: 0.7rem; }
+.game.next { border-color: var(--gold); border-width: 3px; background: var(--surface-2); }
+.when { font-weight: 700; color: var(--gold-hi); }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.25rem 1rem; align-items: center; }
+.team { font-size: 1.3rem; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+.team.mine { color: var(--gold-hi); }
+.vs { color: var(--muted); font-size: 0.9rem; margin: 0.1rem 0; }
+.time { font-family: var(--font-display); font-size: 1.9rem; color: var(--gold); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.champ { color: var(--muted); font-size: 0.95rem; }
+.info { display: flex; flex-direction: column; gap: 0.15rem; align-items: flex-start; }
+
+.line { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.goals { font-family: var(--font-display); font-size: 1.7rem; font-variant-numeric: tabular-nums; }
+.line.win .team, .line.win .goals { color: var(--gold-hi); }
+.line:not(.win) .goals { color: var(--muted); }
+
+.where { border-top: 2px solid var(--line); padding-top: 0.7rem; display: flex; flex-direction: column; gap: 0.3rem; }
+.where-label { font-size: 0.8rem; letter-spacing: 0.1em; font-weight: 700; color: var(--gold); }
+.where-main { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.7rem; }
+.where-tv { font-size: 1.45rem; font-weight: 700; }
+.chip { border: 2px solid var(--gold); border-radius: 99px; padding: 0 0.7rem; font-size: 0.9rem; font-weight: 700; color: var(--gold); white-space: nowrap; }
+.chip.free { background: var(--gold); color: var(--on-gold); }
+.chip.plain { border-color: var(--line); color: var(--muted); }
+.where-hint { color: var(--muted); font-size: 0.95rem; }
+.remind { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 3.2rem; border-radius: 0.8rem; border: 2px solid var(--gold); color: var(--gold-hi); font-weight: 700; text-decoration: none; padding: 0.4rem 0.8rem; }
+
+.news-title { font-size: 1.3rem; font-weight: 700; line-height: 1.25; text-wrap: pretty; }
+
+.table { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.trow { display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto; gap: 0.7rem; align-items: center; background: var(--surface); border: 2px solid var(--line); border-radius: 1rem; padding: 0.7rem 0.9rem; }
+.trow.mine { border-color: var(--gold); border-width: 3px; background: var(--surface-2); }
+.pos { font-family: var(--font-display); font-size: 1.3rem; color: var(--gold); font-variant-numeric: tabular-nums; }
+.tname { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; align-items: flex-start; }
+.tsub { color: var(--muted); font-size: 0.9rem; }
+.pts { text-align: right; display: flex; flex-direction: column; line-height: 1.1; }
+.pts b { font-family: var(--font-display); font-size: 1.7rem; color: var(--gold-hi); font-variant-numeric: tabular-nums; }
+.pts span { font-size: 0.8rem; color: var(--muted); }
+
+.empty { background: var(--surface); border: 2px solid var(--line); border-radius: 1rem; padding: 1.1rem; display: flex; flex-direction: column; gap: 0.8rem; align-items: flex-start; }
+.empty p { margin: 0; font-size: 1.15rem; }
+
+.chosen { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
+.chosen li { border: 2px solid var(--line); border-radius: 99px; padding: 0.15rem 0.8rem; font-size: 0.95rem; }
+
+.myteam { font-family: var(--font-display); font-size: 2rem; line-height: 1.1; color: var(--gold); overflow-wrap: anywhere; }
+
+.group { display: flex; flex-direction: column; gap: 0.5rem; }
+.pick { display: flex; align-items: center; gap: 0.9rem; min-height: 4rem; background: var(--surface); border: 2px solid var(--line); border-radius: 1rem; padding: 0.6rem 1rem; cursor: pointer; }
+.pick input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.box { flex: none; width: 2.1rem; height: 2.1rem; border: 3px solid var(--muted); border-radius: 0.5rem; display: grid; place-items: center; background: var(--bg); color: var(--on-gold); }
+.box.round { border-radius: 50%; }
+.box svg { width: 1.4rem; height: 1.4rem; opacity: 0; }
+.pick-name { font-size: 1.2rem; font-weight: 700; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.pick-state { font-size: 0.9rem; color: var(--muted); font-weight: 400; }
+.pick:has(input:checked) { border-color: var(--gold); background: var(--surface-2); }
+.pick:has(input:checked) .box { background: var(--gold); border-color: var(--gold); }
+.pick:has(input:checked) .box svg { opacity: 1; }
+.pick:has(input:focus-visible) { outline: 4px solid var(--gold-hi); outline-offset: 2px; }
+
+.cta { min-height: 3.6rem; padding: 0.6rem 1.4rem; border-radius: 1rem; border: 0; background: var(--gold); color: var(--on-gold); font-weight: 700; font-size: 1.2rem; }
+.cta.ghost { background: transparent; border: 2px solid var(--gold); color: var(--gold); }
+
+nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--surface); border-top: 3px solid var(--gold); display: flex; gap: 0.5rem;
+  padding: 0.6rem max(12px, env(safe-area-inset-right, 0px)) calc(0.6rem + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
+nav button { flex: 1; min-width: 0; min-height: 3.8rem; border-radius: 1rem; border: 2px solid var(--line); background: var(--bg); font-weight: 700; font-size: 16px; padding: 0.2rem 0.25rem; }
+nav button[aria-current="page"] { background: var(--gold); border-color: var(--gold); color: var(--on-gold); }
+@media (prefers-reduced-motion: no-preference) { .game, .pick { transition: border-color .15s, background .15s; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><div class="avatar" role="img" aria-label="Nildão"></div><div class="logo">Nildão<span>Fut</span></div></div>
+    <button class="size-btn" id="sizeBtn" type="button">Letra: normal</button>
+  </header>
+
+  <main id="screenGames">
+    <div class="wrap">
+      <div id="mascotGames"></div>
+      <div>
+        <h1 id="gamesTitle">Próximos jogos</h1>
+        <p class="lead" id="gamesLead"></p>
+      </div>
+      <ul class="chosen" id="chosen" aria-label="Campeonatos escolhidos"></ul>
+      <div id="gamesList" class="wrap"></div>
+      <p class="note" id="gamesNote"></p>
+    </div>
+  </main>
+
+  <main id="screenTeam" hidden>
+    <div class="wrap" id="teamBody"></div>
+  </main>
+
+  <main id="screenPick" hidden>
+    <div class="wrap">
+      <div>
+        <h1>Escolha os campeonatos</h1>
+        <p class="lead">Toque em quantos quiser. Os jogos de todos aparecem juntos.</p>
+      </div>
+      <div id="pickList" class="wrap"></div>
+      <button class="cta" type="button" id="seeGames">Ver os jogos</button>
+    </div>
+  </main>
+</div>
+
+<nav aria-label="Menu principal">
+  <button type="button" id="tabGames" aria-current="page">Jogos</button>
+  <button type="button" id="tabTeam">Meu time</button>
+  <button type="button" id="tabPick">Campeonatos</button>
+</nav>
+
+<script>
+(function () {
+  var CHAMPS = [
+    { id: 'br-a', group: 'Nacionais', name: 'Brasileirão Série A' },
+    { id: 'br-b', group: 'Nacionais', name: 'Brasileirão Série B' },
+    { id: 'br-copa', group: 'Nacionais', name: 'Copa do Brasil' },
+    { id: 'br-sp', group: 'Estaduais', name: 'Campeonato Paulista', off: true },
+    { id: 'br-rj', group: 'Estaduais', name: 'Campeonato Carioca', off: true },
+    { id: 'br-mg', group: 'Estaduais', name: 'Campeonato Mineiro', off: true },
+    { id: 'br-rs', group: 'Estaduais', name: 'Campeonato Gaúcho', off: true },
+    { id: 'sa-lib', group: 'Times brasileiros na América do Sul', name: 'Libertadores' },
+    { id: 'sa-sul', group: 'Times brasileiros na América do Sul', name: 'Sul-Americana' }
+  ];
+  var TV = {
+    'TV Globo': { kind: 'Canal aberto', free: true, hint: 'Na TV comum, no canal da Globo.' },
+    'CazéTV': { kind: 'Internet', hint: 'Pela internet, no canal CazéTV.' },
+    'SporTV': { kind: 'TV por assinatura', hint: 'Canal SporTV, na TV paga.' },
+    'Premiere': { kind: 'Pago', hint: 'Premiere, na TV paga ou pela internet.' },
+    'ESPN': { kind: 'TV por assinatura', hint: 'Canal ESPN, na TV paga.' },
+    'TNT Sports': { kind: 'TV por assinatura', hint: 'Canal TNT Sports, na TV paga.' }
+  };
+
+  // Dados iniciais. Ao abrir, o app troca por data.json, que o robô atualiza sozinho.
+  var SEED = {"updated": "2026-10-16T21:00-03:00", "status": {"brasileirao": "semente", "canais": "semente", "copas": "manual", "noticias": "semente"}, "table": [[1, "Flamengo", 64, 30, 19, 7, 4, 58, 25, 33], [2, "Palmeiras", 63, 30, 18, 9, 3, 52, 22, 30], [3, "Athletico-PR", 53, 30, 15, 8, 7, 49, 35, 14], [4, "Fluminense", 51, 30, 14, 9, 7, 48, 37, 11], [5, "Bahia", 49, 30, 13, 10, 7, 44, 36, 8], [6, "Cruzeiro", 48, 30, 14, 6, 10, 46, 44, 2], [7, "Atlético-MG", 47, 30, 13, 8, 9, 41, 35, 6], [8, "Santos", 42, 30, 11, 9, 10, 46, 45, 1], [9, "Red Bull Bragantino", 40, 30, 11, 7, 12, 38, 35, 3], [10, "São Paulo", 39, 30, 11, 6, 13, 35, 35, 0], [11, "Coritiba", 39, 30, 10, 9, 11, 38, 48, -10], [12, "Vitória", 36, 30, 10, 6, 14, 33, 44, -11], [13, "Botafogo", 36, 30, 9, 9, 12, 43, 48, -5], [14, "Vasco", 35, 29, 9, 8, 12, 36, 42, -6], [15, "Mirassol", 33, 30, 8, 9, 13, 34, 44, -10], [16, "Corinthians", 32, 30, 8, 8, 14, 31, 38, -7], [17, "Internacional", 32, 30, 7, 11, 12, 33, 38, -5], [18, "Grêmio", 31, 30, 7, 10, 13, 32, 40, -8], [19, "Remo", 25, 30, 5, 10, 15, 33, 48, -15], [20, "Chapecoense", 18, 29, 3, 9, 17, 30, 61, -31]], "games": [{"c": "br-a", "date": "2026-10-12", "t": "19:30", "h": "Red Bull Bragantino", "a": "Cruzeiro", "tv": "", "v": "Estádio Cícero de Souza Marques", "s": [4, 2]}, {"c": "br-a", "date": "2026-10-12", "t": "19:30", "h": "Chapecoense", "a": "Athletico-PR", "tv": "", "v": "Arena Condá", "s": [1, 4]}, {"c": "sa-sul", "date": "2026-10-13", "t": "21:30", "h": "Boca Juniors", "a": "Vasco", "tv": "", "v": "La Bombonera", "s": [0, 1]}, {"c": "sa-sul", "date": "2026-10-14", "t": "19:00", "h": "Atlético-MG", "a": "Montevideo City Torque", "tv": "", "v": "Arena MRV", "s": [3, 0]}, {"c": "sa-lib", "date": "2026-10-14", "t": "21:30", "h": "Fluminense", "a": "Palmeiras", "tv": "", "v": "Maracanã", "s": [1, 2]}, {"c": "sa-lib", "date": "2026-10-15", "t": "21:30", "h": "Estudiantes", "a": "Flamengo", "tv": "", "v": "Jorge Luis Hirsch", "s": [0, 0]}, {"c": "br-a", "date": "2026-10-16", "t": "20:00", "h": "Mirassol", "a": "Internacional", "tv": "Premiere", "v": "José Maria de Campos Maia"}, {"c": "br-a", "date": "2026-10-17", "t": "18:00", "h": "Botafogo", "a": "Chapecoense", "tv": "Premiere", "v": "Nilton Santos"}, {"c": "br-a", "date": "2026-10-17", "t": "18:30", "h": "Atlético-MG", "a": "Coritiba", "tv": "Premiere", "v": "Arena MRV"}, {"c": "br-a", "date": "2026-10-17", "t": "19:30", "h": "Athletico-PR", "a": "Palmeiras", "tv": "CazéTV / Premiere", "v": "Arena da Baixada"}, {"c": "br-a", "date": "2026-10-17", "t": "21:00", "h": "São Paulo", "a": "Vasco", "tv": "SporTV / Premiere", "v": "Morumbis"}, {"c": "br-a", "date": "2026-10-18", "t": "16:00", "h": "Fluminense", "a": "Santos", "tv": "Premiere", "v": "Maracanã"}, {"c": "br-a", "date": "2026-10-18", "t": "16:00", "h": "Grêmio", "a": "Cruzeiro", "tv": "Premiere", "v": "Arena do Grêmio"}, {"c": "br-a", "date": "2026-10-18", "t": "18:30", "h": "Bahia", "a": "Flamengo", "tv": "TV Globo / Premiere", "v": "Arena Fonte Nova"}, {"c": "br-a", "date": "2026-10-18", "t": "19:30", "h": "Remo", "a": "Red Bull Bragantino", "tv": "Premiere", "v": "Mangueirão"}, {"c": "br-a", "date": "2026-10-19", "t": "20:00", "h": "Corinthians", "a": "Vitória", "tv": "Premiere", "v": "Neo Química Arena"}, {"c": "sa-sul", "date": "2026-10-20", "t": "21:30", "h": "Vasco", "a": "Boca Juniors", "tv": "", "v": "Maracanã"}, {"c": "sa-sul", "date": "2026-10-21", "t": "19:00", "h": "Montevideo City Torque", "a": "Atlético-MG", "tv": "", "v": "Centenário"}, {"c": "sa-lib", "date": "2026-10-21", "t": "21:30", "h": "Palmeiras", "a": "Fluminense", "tv": "", "v": "Nubank Parque"}, {"c": "sa-lib", "date": "2026-10-22", "t": "21:30", "h": "Flamengo", "a": "Estudiantes", "tv": "", "v": "Maracanã"}, {"c": "br-copa", "date": "2026-11-01", "t": "16:00", "h": "Palmeiras", "a": "Vasco", "tv": "", "v": "Nubank Parque"}, {"c": "br-copa", "date": "2026-11-01", "t": "18:30", "h": "Grêmio", "a": "Atlético-MG", "tv": "", "v": "Arena do Grêmio"}, {"c": "br-copa", "date": "2026-11-07", "t": "18:00", "h": "Atlético-MG", "a": "Grêmio", "tv": "", "v": "Arena MRV"}, {"c": "br-copa", "date": "2026-11-08", "t": "17:00", "h": "Vasco", "a": "Palmeiras", "tv": "", "v": "São Januário"}], "news": {"Santos": [{"t": "Gabigol rebate provocação do Atlético-MG e relembra título conquistado na Arena MRV", "d": "12/10/2026", "u": "https://www.gazetaesportiva.com/times/santos/gabigol-responde-provocacao-atletico-mg-arena-mrv/", "ts": 1791817200}, {"t": "Santos despenca em projeção e vê Atlético-MG aumentar chances de Libertadores", "d": "12/10/2026", "u": "https://www.gazetaesportiva.com/campeonatos/brasileiro-serie-a/atletico-mg-cresce-na-disputa-por-vaga-na-libertadores-e-santos-ve-chances-cairem/", "ts": 1791817199}, {"t": "Coutinho dá primeira assistência pelo Santos e encerra jejum de oito meses", "d": "12/10/2026", "u": "https://www.gazetaesportiva.com/times/santos/coutinho-da-primeira-assistencia-pelo-santos-e-encerra-jejum-de-oito-meses/", "ts": 1791817198}, {"t": "Atuações do Santos: Cebolinha e Escobar decepcionam em derrota do Santos", "d": "12/10/2026", "u": "https://www.gazetaesportiva.com/times/santos/atuacoes-do-santos-cebolinha-e-escobar-decepcionam-em-derrota-do-santos/", "ts": 1791817197}, {"t": "Análise: Santos paga por falta de capricho em virada do Atlético-MG", "d": "12/10/2026", "u": "https://www.gazetaesportiva.com/times/santos/analise-santos-paga-por-falta-de-capricho-em-virada-do-atletico-mg/", "ts": 1791817196}]}};
+
+  function daysFrom(ds) {
+    var p = ds.split('-'), a = new Date(+p[0], +p[1] - 1, +p[2], 12), b = new Date();
+    b.setHours(12, 0, 0, 0);
+    return Math.round((a - b) / 86400000);
+  }
+
+  var DATA = SEED, TABLE = [], CLUBS = [], NEWS = {}, GAMES = [];
+  function applyData(d) {
+    DATA = d;
+    TABLE = d.table || [];
+    CLUBS = TABLE.map(function (r) { return r[1]; }).sort(function (a, b) { return a.localeCompare(b, 'pt-BR'); });
+    NEWS = {};
+    Object.keys(d.news || {}).forEach(function (k) { NEWS[k] = { source: 'Gazeta Esportiva', items: d.news[k] }; });
+    GAMES = (d.games || []).map(function (x) {
+      var g = { c: x.c, d: daysFrom(x.date), t: x.t, h: x.h, a: x.a, tv: x.tv || '', v: x.v || '' };
+      if (x.s) g.s = x.s;
+      if (x.tbc) g.tbc = true;
+      return g;
+    });
+    GAMES.sort(function (x, y) { return x.d - y.d || x.t.localeCompare(y.t); });
+  }
+  applyData(SEED);
+
+  function sampleNote() {
+    var st = DATA.status || {}, parts = [];
+    parts.push(st.brasileirao === 'ok' ? 'Jogos, placares e tabela do Brasileirão se atualizam sozinhos a cada poucas horas.' : 'Jogos e tabela do Brasileirão ainda são de exemplo, sem atualização automática.');
+    if (st.canais !== 'ok') parts.push('Alguns canais ainda estão a confirmar.');
+    if (st.copas !== 'ok') parts.push('Libertadores, Sul-Americana e Copa do Brasil ainda não se atualizam sozinhas.');
+    var u = DATA.updated ? new Date(DATA.updated) : null;
+    if (u && !isNaN(u)) parts.push('Última atualização: ' + u.toLocaleDateString('pt-BR') + ' às ' + hmTxt(p2(u.getHours()) + ':' + p2(u.getMinutes())) + '.');
+    return parts.join(' ');
+  }
+  var SIZES = [{ s: 1, label: 'normal' }, { s: 1.2, label: 'grande' }, { s: 1.4, label: 'enorme' }];
+
+  function load(key, fallback) { try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; } }
+  function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+  var $ = function (id) { return document.getElementById(id); };
+  var p2 = function (n) { return (n < 10 ? '0' : '') + n; };
+
+  var champName = {}; CHAMPS.forEach(function (c) { champName[c.id] = c.name; });
+  var sel = load('nf-sel', ['br-a', 'sa-lib']);
+  if (!Array.isArray(sel)) sel = ['br-a', 'sa-lib'];
+  sel = sel.filter(function (id) { return champName[id]; });
+  var team = load('nf-team', 'Santos');
+  if (CLUBS.indexOf(team) < 0) team = '';
+  var editingTeam = false, teamTab = 'games', gamesTab = 'next', days = 7;
+  var sizeIdx = load('nf-size', 0);
+  if (typeof sizeIdx !== 'number' || !SIZES[sizeIdx]) sizeIdx = 0;
+
+
+  function applySize() {
+    document.documentElement.style.setProperty('--scale', SIZES[sizeIdx].s);
+    $('sizeBtn').textContent = 'Letra: ' + SIZES[sizeIdx].label;
+  }
+
+  function dateOf(d, t) {
+    var x = new Date(); x.setDate(x.getDate() + d);
+    var hm = t.split(':'); x.setHours(+hm[0], +hm[1], 0, 0); return x;
+  }
+  function dayLabel(d) {
+    var x = dateOf(d, '12:00');
+    var txt = x.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+    return { text: txt.charAt(0).toUpperCase() + txt.slice(1), badge: d === 0 ? 'HOJE' : d === 1 ? 'AMANHÃ' : d === -1 ? 'ONTEM' : '' };
+  }
+  function calLink(g) {
+    var s = dateOf(g.d, g.t), e = new Date(s.getTime() + 2 * 3600000);
+    var f = function (x) { return x.getFullYear() + p2(x.getMonth() + 1) + p2(x.getDate()) + 'T' + p2(x.getHours()) + p2(x.getMinutes()) + '00'; };
+    return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(g.h + ' x ' + g.a) +
+      '&dates=' + f(s) + '/' + f(e) + '&ctz=America%2FSao_Paulo&location=' + encodeURIComponent(g.v || g.tv || '') +
+      '&details=' + encodeURIComponent('Onde assistir: ' + (g.tv || 'canal a confirmar') + '. ' + champName[g.c]);
+  }
+  function whenLine(g, prefix) {
+    var l = dayLabel(g.d);
+    return '<div class="when">' + (prefix || '') + (l.badge ? l.badge + ' · ' : '') + l.text + '</div>';
+  }
+  function exChip(g) { return g.tbc ? '<span class="chip plain">Horário a confirmar</span>' : ''; }
+
+  function hmTxt(t) { var p = t.split(':'); return +p[0] + 'h' + (p[1] === '00' ? '' : p[1]); }
+  function mascotHtml() {
+    var msg;
+    var next = team ? GAMES.filter(function (g) { return !g.s && g.d >= 0 && (g.h === team || g.a === team); })[0] : null;
+    if (!team) {
+      msg = 'Escolha o seu time na aba "Meu time" e eu mostro os jogos dele.';
+    } else if (!next) {
+      msg = 'Ainda não tenho o próximo jogo do ' + team + '.';
+    } else {
+      var wd = dateOf(next.d, '12:00').toLocaleDateString('pt-BR', { weekday: 'long' });
+      var when = next.d === 0 ? 'hoje' : next.d === 1 ? 'amanhã' : (/feira$/.test(wd) ? 'na ' : 'no ') + wd;
+      var at = 'às ' + hmTxt(next.t) + ': ' + next.h + ' x ' + next.a + '.';
+      msg = next.d === 0 ? 'Hoje tem jogo do ' + team + '! Começa ' + at : 'O próximo jogo do ' + team + ' é ' + when + ', ' + at;
+      msg += next.tv ? ' Onde ver: ' + next.tv.replace(' / ', ' ou ') + '.' : ' O canal ainda não foi informado.';
+    }
+    return '<div class="mascot"><img src="nildao.png" alt="Nildão, o personagem do app" width="84"><div class="bubble"><b>Fala, torcedor!</b><span>' + msg + '</span></div></div>';
+  }
+
+  function card(g, o) {
+    o = o || {};
+    var tv = TV[g.tv];
+    var teams = [g.h, g.a].map(function (n) { return '<div class="team' + (n === team ? ' mine' : '') + '">' + n + '</div>'; }).join('<div class="vs">contra</div>');
+    var info = o.showDay && team ? (g.h === team ? 'Joga em casa' : 'Joga fora de casa') + ' · ' + champName[g.c] : champName[g.c];
+    var chans = g.tv ? g.tv.split(' / ') : [];
+    var where = chans.length ? chans.map(function (c) {
+      var k = TV[c];
+      return '<div class="where-main"><span class="where-tv">' + c + '</span>' + (k ? '<span class="chip' + (k.free ? ' free' : '') + '">' + k.kind + '</span>' : '') + '</div>' + (k && k.hint ? '<div class="where-hint">' + k.hint + '</div>' : '');
+    }).join('') : '<div class="where-main"><span class="where-tv">A confirmar</span></div>';
+    var hint = chans.length > 1 ? 'Passa em mais de um canal: ele pode ver em qualquer um.' : chans.length ? '' : 'O canal ainda não foi informado para este jogo.';
+    return '<article class="game' + (o.next ? ' next' : '') + '">' + (o.showDay ? whenLine(g, o.next ? 'PRÓXIMO JOGO · ' : '') : '') +
+      '<div class="row"><div>' + teams + '</div><div class="time">' + g.t.replace(':', 'h') + '</div></div>' +
+      '<div class="info"><div class="champ">' + info + '</div>' + (g.v ? '<div class="champ">Estádio: ' + g.v + '</div>' : '') + exChip(g) + '</div>' +
+      '<div class="where"><div class="where-label">ONDE ASSISTIR</div>' + where +
+      (hint ? '<div class="where-hint">' + hint + '</div>' : '') + '</div>' +
+      '<a class="remind" href="' + calLink(g) + '" target="_blank" rel="noopener">Avisar 30 min antes</a></article>';
+  }
+
+  function resultCard(g, o) {
+    o = o || {};
+    var hw = g.s[0] > g.s[1], aw = g.s[1] > g.s[0];
+    var line = function (n, goals, w) { return '<div class="line' + (w ? ' win' : '') + '"><span class="team' + (n === team ? ' mine' : '') + '">' + n + '</span><span class="goals">' + goals + '</span></div>'; };
+    var chip = '';
+    if (o.showDay && (g.h === team || g.a === team)) {
+      var gf = g.h === team ? g.s[0] : g.s[1], ga = g.h === team ? g.s[1] : g.s[0];
+      chip = gf > ga ? '<span class="chip free">Vitória</span>' : gf < ga ? '<span class="chip plain">Derrota</span>' : '<span class="chip">Empate</span>';
+    }
+    return '<article class="game">' + (o.showDay ? whenLine(g) : '') + line(g.h, g.s[0], hw) + line(g.a, g.s[1], aw) +
+      '<div class="where-main"><span class="champ">' + champName[g.c] + ' · jogo encerrado</span>' + chip + exChip(g) + '</div></article>';
+  }
+
+  function newsCard(it) {
+    return '<article class="game"><div class="when">' + it.d + ' · Gazeta Esportiva</div><div class="news-title">' + it.t + '</div>' +
+      '<a class="remind" href="' + it.u + '" target="_blank" rel="noopener">Ler no site da Gazeta Esportiva</a></article>';
+  }
+
+  function tableHtml() {
+    return '<ol class="table">' + TABLE.map(function (r) {
+      var mine = r[1] === team;
+      return '<li class="trow' + (mine ? ' mine' : '') + '"><span class="pos">' + r[0] + 'º</span><div class="tname"><div class="team' + (mine ? ' mine' : '') + '">' + r[1] + '</div>' +
+        '<div class="tsub">' + r[3] + ' jogos · ' + r[4] + ' V · ' + r[5] + ' E · ' + r[6] + ' D · saldo ' + r[9] + '</div>' +
+        (r[0] >= 17 ? '<span class="chip plain">Zona de rebaixamento</span>' : '') +
+        '</div><div class="pts"><b>' + r[2] + '</b><span>pontos</span></div></li>';
+    }).join('') + '</ol>';
+  }
+
+  function byDay(list, fn) {
+    var html = '', last = null;
+    list.forEach(function (g) {
+      if (g.d !== last) {
+        if (last !== null) html += '</section>';
+        var l = dayLabel(g.d);
+        html += '<section class="day"><div class="day-head">' + (l.badge ? '<span class="badge">' + l.badge + '</span>' : '') + '<span class="day-name">' + l.text + '</span></div>';
+        last = g.d;
+      }
+      html += fn(g);
+    });
+    return last !== null ? html + '</section>' : html;
+  }
+  function seg(items, active, attr) {
+    return '<div class="seg" role="group">' + items.map(function (i) {
+      return '<button type="button" ' + attr + '="' + i[0] + '" aria-pressed="' + (i[0] === active) + '">' + i[1] + '</button>';
+    }).join('') + '</div>';
+  }
+
+  function renderGames() {
+    var n = sel.length, list = $('gamesList');
+    $('mascotGames').innerHTML = mascotHtml();
+    var head = seg([['next', 'Próximos'], ['results', 'Resultados'], ['table', 'Tabela']], gamesTab, 'data-gtab');
+    $('gamesTitle').textContent = gamesTab === 'next' ? 'Próximos jogos' : gamesTab === 'results' ? 'Resultados' : 'Tabela do Brasileirão';
+    $('chosen').hidden = gamesTab === 'table';
+    $('gamesNote').textContent = sampleNote() + (gamesTab === 'next' ? ' Ao tocar em "Avisar 30 min antes", abre o Google Agenda: toque em Salvar e o celular avisa antes do jogo (o aviso segue o ajuste do seu Google Agenda, que costuma ser 30 minutos).' : '');
+    if (gamesTab === 'table') {
+      $('gamesLead').textContent = 'Série A, depois da 30ª rodada. Vasco e Chapecoense têm um jogo a menos.';
+      list.innerHTML = head + tableHtml();
+      return;
+    }
+    $('gamesLead').textContent = n === 0 ? 'Nenhum campeonato escolhido.' : n === 1 ? 'Mostrando 1 campeonato.' : 'Mostrando ' + n + ' campeonatos.';
+    $('chosen').innerHTML = sel.map(function (id) { return '<li>' + champName[id] + '</li>'; }).join('');
+    if (n === 0) {
+      list.innerHTML = head + '<div class="empty"><p>Escolha pelo menos um campeonato para ver os jogos.</p><button class="cta" type="button" data-go="pick">Escolher campeonatos</button></div>';
+      return;
+    }
+    var mineSel = GAMES.filter(function (g) { return sel.indexOf(g.c) > -1; });
+    var html;
+    if (gamesTab === 'results') {
+      var past = mineSel.filter(function (g) { return g.s; }).sort(function (x, y) { return y.d - x.d || y.t.localeCompare(x.t); }).slice(0, 30);
+      html = past.length ? byDay(past, function (g) { return resultCard(g); }) : '<div class="empty"><p>Não há resultados para estes campeonatos.</p></div>';
+    } else {
+      var all = mineSel.filter(function (g) { return !g.s && g.d >= 0; });
+      if (!all.length) {
+        list.innerHTML = head + '<div class="empty"><p>Não há jogos para estes campeonatos. Campeonatos estaduais estão fora de temporada nesta época do ano.</p><button class="cta" type="button" data-go="pick">Trocar campeonatos</button></div>';
+        return;
+      }
+      var shown = all.filter(function (g) { return g.d < days; });
+      html = shown.length ? byDay(shown, function (g) { return card(g); }) : '<div class="empty"><p>Nenhum jogo nos próximos ' + days + ' dias.</p></div>';
+      if (all.length > shown.length) html += '<button class="cta ghost" type="button" data-more="1">Ver mais 7 dias</button>';
+    }
+    list.innerHTML = head + html;
+  }
+
+  var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>';
+
+  function renderTeam() {
+    var body = $('teamBody');
+    if (!team || editingTeam) {
+      body.innerHTML = '<div><h1>Qual é o time do coração?</h1><p class="lead">Toque no time. Depois mostramos os jogos, os resultados e as notícias dele.</p></div><div class="stack" id="teamPick">' +
+        CLUBS.map(function (c) {
+          return '<label class="pick"><input type="radio" name="club" value="' + c + '"' + (c === team ? ' checked' : '') + '><span class="box round">' + CHECK + '</span><span class="pick-name">' + c + '</span></label>';
+        }).join('') + '</div>' + (team ? '<button class="cta ghost" type="button" data-cancel="1">Voltar sem trocar</button>' : '');
+      return;
+    }
+    var mine = GAMES.filter(function (g) { return g.h === team || g.a === team; });
+    var row = TABLE.filter(function (r) { return r[1] === team; })[0];
+    var html = mascotHtml() + '<div><h1>Meu time</h1><div class="myteam">' + team + '</div>' + (row ? '<p class="lead">' + row[0] + 'º lugar no Brasileirão · ' + row[2] + ' pontos</p>' : '') + '</div>' +
+      '<button class="cta ghost" type="button" data-change="1">Trocar de time</button>' +
+      seg([['games', 'Jogos'], ['results', 'Resultados'], ['news', 'Notícias']], teamTab, 'data-tab');
+    var note = sampleNote();
+    if (teamTab === 'games') {
+      var up = mine.filter(function (g) { return !g.s && g.d >= 0; });
+      html += up.length ? '<div class="stack">' + up.map(function (g, i) { return card(g, { showDay: true, next: i === 0 }); }).join('') + '</div>' : '<div class="empty"><p>Ainda não há jogos para o ' + team + '.</p></div>';
+    } else if (teamTab === 'results') {
+      var past = mine.filter(function (g) { return g.s; }).sort(function (x, y) { return y.d - x.d; }).slice(0, 15);
+      html += past.length ? '<div class="stack">' + past.map(function (g) { return resultCard(g, { showDay: true }); }).join('') + '</div>' : '<div class="empty"><p>Ainda não há placar do ' + team + ' nesta fonte. A página da Gazeta mostra só alguns placares da rodada.</p></div>';
+    } else {
+      var nw = NEWS[team];
+      if (!nw) {
+        html += '<div class="empty"><p>Ainda não há notícias do ' + team + ' por aqui.</p></div>';
+      } else {
+        html += '<h2 class="sec">Últimas 5 notícias</h2><div class="stack">' + nw.items.slice(0, 5).map(newsCard).join('') + '</div>';
+      }
+      note = 'Mostramos só o título; a matéria completa abre no site da Gazeta Esportiva. São sempre as 5 mais novas: quando sai uma nova, a mais antiga deixa a lista.' + (DATA.status && DATA.status.noticias === 'ok' ? ' Elas se atualizam sozinhas.' : ' Estas são de exemplo e ainda não se atualizam sozinhas.');
+    }
+    body.innerHTML = html + '<p class="note">' + note + '</p>';
+  }
+
+  function renderPick() {
+    var order = [], groups = {};
+    CHAMPS.forEach(function (c) { if (!groups[c.group]) { groups[c.group] = []; order.push(c.group); } groups[c.group].push(c); });
+    $('pickList').innerHTML = order.map(function (gr) {
+      return '<section class="group"><h2 class="sec">' + gr + '</h2>' + groups[gr].map(function (c) {
+        var on = sel.indexOf(c.id) > -1;
+        return '<label class="pick"><input type="checkbox" value="' + c.id + '"' + (on ? ' checked' : '') + '><span class="box">' + CHECK + '</span><span class="pick-name">' + c.name + (c.off ? '<div class="pick-state">Fora de temporada agora</div>' : '') + '</span></label>';
+      }).join('') + '</section>';
+    }).join('');
+  }
+
+  var SCREENS = { games: ['screenGames', 'tabGames', renderGames], team: ['screenTeam', 'tabTeam', renderTeam], pick: ['screenPick', 'tabPick', renderPick] };
+  function show(which) {
+    Object.keys(SCREENS).forEach(function (k) {
+      var on = k === which;
+      $(SCREENS[k][0]).hidden = !on;
+      if (on) $(SCREENS[k][1]).setAttribute('aria-current', 'page'); else $(SCREENS[k][1]).removeAttribute('aria-current');
+    });
+    SCREENS[which][2]();
+    window.scrollTo(0, 0);
+  }
+
+  $('tabGames').addEventListener('click', function () { show('games'); });
+  $('tabTeam').addEventListener('click', function () { editingTeam = false; show('team'); });
+  $('tabPick').addEventListener('click', function () { show('pick'); });
+  $('seeGames').addEventListener('click', function () { show('games'); });
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-go],[data-more],[data-change],[data-cancel],[data-tab],[data-gtab]');
+    if (!t) return;
+    if (t.hasAttribute('data-go')) show(t.getAttribute('data-go'));
+    else if (t.hasAttribute('data-more')) { days += 7; renderGames(); }
+    else if (t.hasAttribute('data-tab')) { teamTab = t.getAttribute('data-tab'); renderTeam(); }
+    else if (t.hasAttribute('data-gtab')) { gamesTab = t.getAttribute('data-gtab'); renderGames(); }
+    else if (t.hasAttribute('data-change')) { editingTeam = true; renderTeam(); window.scrollTo(0, 0); }
+    else if (t.hasAttribute('data-cancel')) { editingTeam = false; renderTeam(); window.scrollTo(0, 0); }
+  });
+  $('pickList').addEventListener('change', function (e) {
+    var id = e.target.value;
+    sel = sel.filter(function (x) { return x !== id; });
+    if (e.target.checked) sel.push(id);
+    save('nf-sel', sel);
+  });
+  $('teamBody').addEventListener('change', function (e) {
+    if (e.target.name !== 'club') return;
+    team = e.target.value; editingTeam = false; save('nf-team', team);
+    renderTeam(); window.scrollTo(0, 0);
+  });
+  $('sizeBtn').addEventListener('click', function () { sizeIdx = (sizeIdx + 1) % SIZES.length; save('nf-size', sizeIdx); applySize(); });
+
+  applySize();
+  renderGames();
+  try {
+    fetch('data.json', { cache: 'no-store' }).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
+      if (!d || !d.games || !d.table || !d.table.length) return;
+      applyData(d);
+      if (team && CLUBS.indexOf(team) < 0) team = '';
+      var cur = ['games', 'team', 'pick'].filter(function (k) { return !$(SCREENS[k][0]).hidden; })[0] || 'games';
+      SCREENS[cur][2]();
+    }).catch(function () {});
+  } catch (e) {}
+  try { if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js'); } catch (e) {}
+})();
+</script>
+</body>
+</html>
