@@ -251,7 +251,7 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
   var sel = load('nf-sel', ['br-a', 'sa-lib']);
   if (!Array.isArray(sel)) sel = ['br-a', 'sa-lib'];
   sel = sel.filter(function (id) { return champName[id]; });
-  var team = load('nf-team', 'Santos');
+  var team = load('nf-team', '');
   if (CLUBS.indexOf(team) < 0) team = '';
   var editingTeam = false, teamTab = 'games', gamesTab = 'next', days = 7;
   var sizeIdx = load('nf-size', 0);
@@ -286,10 +286,12 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
   function exChip(g) { return g.tbc ? '<span class="chip plain">Horário a confirmar</span>' : ''; }
 
   function hmTxt(t) { var p = t.split(':'); return +p[0] + 'h' + (p[1] === '00' ? '' : p[1]); }
-  function mascotHtml() {
+  function mascotHtml(welcome) {
     var msg;
     var next = team ? GAMES.filter(function (g) { return !g.s && g.d >= 0 && (g.h === team || g.a === team); })[0] : null;
-    if (!team) {
+    if (welcome) {
+      msg = 'Seja bem-vindo! Toque no time do seu coração e eu cuido do resto.';
+    } else if (!team) {
       msg = 'Escolha o seu time na aba "Meu time" e eu mostro os jogos dele.';
     } else if (!next) {
       msg = 'Ainda não tenho o próximo jogo do ' + team + '.';
@@ -417,7 +419,7 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
   function renderTeam() {
     var body = $('teamBody');
     if (!team || editingTeam) {
-      body.innerHTML = '<div><h1>Qual é o time do coração?</h1><p class="lead">Toque no time. Depois mostramos os jogos, os resultados e as notícias dele.</p></div><div class="stack" id="teamPick">' +
+      body.innerHTML = (team ? '' : mascotHtml(true)) + '<div><h1>Qual é o time do coração?</h1><p class="lead">Toque no time. Depois mostramos os jogos, os resultados e as notícias dele.</p></div><div class="stack" id="teamPick">' +
         CLUBS.map(function (c) {
           return '<label class="pick"><input type="radio" name="club" value="' + c + '"' + (c === team ? ' checked' : '') + '><span class="box round">' + CHECK + '</span><span class="pick-name">' + c + '</span></label>';
         }).join('') + '</div>' + (team ? '<button class="cta ghost" type="button" data-cancel="1">Voltar sem trocar</button>' : '');
@@ -497,7 +499,7 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
   $('sizeBtn').addEventListener('click', function () { sizeIdx = (sizeIdx + 1) % SIZES.length; save('nf-size', sizeIdx); applySize(); });
 
   applySize();
-  renderGames();
+  if (team) renderGames(); else show('team');
   try {
     fetch('data.json', { cache: 'no-store' }).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
       if (!d || !d.games || !d.table || !d.table.length) return;
