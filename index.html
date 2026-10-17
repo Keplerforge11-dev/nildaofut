@@ -300,7 +300,7 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
       msg = next.d === 0 ? 'Hoje tem jogo do ' + team + '! Começa ' + at : 'O próximo jogo do ' + team + ' é ' + when + ', ' + at;
       msg += next.tv ? ' Onde ver: ' + next.tv.replace(' / ', ' ou ') + '.' : ' O canal ainda não foi informado.';
     }
-    return '<div class="mascot"><img src="nildao.png" alt="Nildão, o personagem do app" width="84"><div class="bubble"><b>Fala, torcedor!</b><span>' + msg + '</span></div></div>';
+    return '<div class="mascot"><img src="' + (team && team !== 'Santos' ? 'nildao-selecao.png' : 'nildao.png') + '" alt="Nildão, o personagem do app" width="84"><div class="bubble"><b>Fala, torcedor!</b><span>' + msg + '</span></div></div>';
   }
 
   function esc(x) {
