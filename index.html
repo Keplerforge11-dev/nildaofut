@@ -75,8 +75,10 @@ h2.sec { font-family: var(--font-display); font-size: 1.05rem; margin: 0.4rem 0 
 .game { background: var(--surface); border: 2px solid var(--line); border-radius: 1rem; padding: 0.9rem 1rem; display: flex; flex-direction: column; gap: 0.7rem; }
 .game.next { border-color: var(--gold); border-width: 3px; background: var(--surface-2); }
 .when { font-weight: 700; color: var(--gold-hi); }
-.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.25rem 1rem; align-items: center; }
-.team { font-size: 1.3rem; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+.row { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; align-items: center; }
+.row > div:first-child { flex: 1 1 11rem; min-width: 0; }
+.row > .time { flex: none; }
+.team { font-size: 1.3rem; font-weight: 700; line-height: 1.2; overflow-wrap: break-word; }
 .team.mine { color: var(--gold-hi); }
 .vs { color: var(--muted); font-size: 0.9rem; margin: 0.1rem 0; }
 .time { font-family: var(--font-display); font-size: 1.9rem; color: var(--gold); white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -116,7 +118,7 @@ h2.sec { font-family: var(--font-display); font-size: 1.05rem; margin: 0.4rem 0 
 .chosen { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
 .chosen li { border: 2px solid var(--line); border-radius: 99px; padding: 0.15rem 0.8rem; font-size: 0.95rem; }
 
-.myteam { font-family: var(--font-display); font-size: 2rem; line-height: 1.1; color: var(--gold); overflow-wrap: anywhere; }
+.myteam { font-family: var(--font-display); font-size: 2rem; line-height: 1.1; color: var(--gold); overflow-wrap: break-word; }
 
 .group { display: flex; flex-direction: column; gap: 0.5rem; }
 .pick { display: flex; align-items: center; gap: 0.9rem; min-height: 4rem; background: var(--surface); border: 2px solid var(--line); border-radius: 1rem; padding: 0.6rem 1rem; cursor: pointer; }
@@ -124,7 +126,7 @@ h2.sec { font-family: var(--font-display); font-size: 1.05rem; margin: 0.4rem 0 
 .box { flex: none; width: 2.1rem; height: 2.1rem; border: 3px solid var(--muted); border-radius: 0.5rem; display: grid; place-items: center; background: var(--bg); color: var(--on-gold); }
 .box.round { border-radius: 50%; }
 .box svg { width: 1.4rem; height: 1.4rem; opacity: 0; }
-.pick-name { font-size: 1.2rem; font-weight: 700; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.pick-name { font-size: 1.2rem; font-weight: 700; flex: 1; min-width: 0; overflow-wrap: break-word; }
 .pick-state { font-size: 0.9rem; color: var(--muted); font-weight: 400; }
 .pick:has(input:checked) { border-color: var(--gold); background: var(--surface-2); }
 .pick:has(input:checked) .box { background: var(--gold); border-color: var(--gold); }
@@ -134,9 +136,9 @@ h2.sec { font-family: var(--font-display); font-size: 1.05rem; margin: 0.4rem 0 
 .cta { min-height: 3.6rem; padding: 0.6rem 1.4rem; border-radius: 1rem; border: 0; background: var(--gold); color: var(--on-gold); font-weight: 700; font-size: 1.2rem; }
 .cta.ghost { background: transparent; border: 2px solid var(--gold); color: var(--gold); }
 
-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--surface); border-top: 3px solid var(--gold); display: flex; gap: 0.5rem;
-  padding: 0.6rem max(12px, env(safe-area-inset-right, 0px)) calc(0.6rem + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
-nav button { flex: 1; min-width: 0; min-height: 3.8rem; border-radius: 1rem; border: 2px solid var(--line); background: var(--bg); font-weight: 700; font-size: 16px; padding: 0.2rem 0.25rem; }
+nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--surface); border-top: 3px solid var(--gold); display: flex; gap: 8px;
+  padding: 10px max(12px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
+nav button { flex: 1; min-width: 0; min-height: 64px; border-radius: 1rem; border: 2px solid var(--line); background: var(--bg); font-weight: 700; font-size: 16px; padding: 0.2rem 0.25rem; }
 nav button[aria-current="page"] { background: var(--gold); border-color: var(--gold); color: var(--on-gold); }
 @media (prefers-reduced-motion: no-preference) { .game, .pick { transition: border-color .15s, background .15s; } }
 </style>
