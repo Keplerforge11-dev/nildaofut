@@ -345,7 +345,7 @@ def buscar_noticias(antigas):
             for it in itens:
                 titulo = html.unescape((it.findtext("title") or "").strip())
                 url = (it.findtext("link") or "").strip()
-                if not titulo or not url:
+                if not titulo or not url.startswith(GAZETA):
                     continue
                 try:
                     dt = parsedate_to_datetime(it.findtext("pubDate")).astimezone(TZ)

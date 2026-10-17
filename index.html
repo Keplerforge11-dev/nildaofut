@@ -303,20 +303,27 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
     return '<div class="mascot"><img src="nildao.png" alt="Nildão, o personagem do app" width="84"><div class="bubble"><b>Fala, torcedor!</b><span>' + msg + '</span></div></div>';
   }
 
+  function esc(x) {
+    return String(x == null ? '' : x).replace(/[&<>"']/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]; });
+  }
+  function safeUrl(u) {
+    return /^https:\/\/(www\.)?gazetaesportiva\.com\//.test(u) ? esc(u) : 'https://www.gazetaesportiva.com/';
+  }
+
   function card(g, o) {
     o = o || {};
     var tv = TV[g.tv];
-    var teams = [g.h, g.a].map(function (n) { return '<div class="team' + (n === team ? ' mine' : '') + '">' + n + '</div>'; }).join('<div class="vs">contra</div>');
+    var teams = [g.h, g.a].map(function (n) { return '<div class="team' + (n === team ? ' mine' : '') + '">' + esc(n) + '</div>'; }).join('<div class="vs">contra</div>');
     var info = o.showDay && team ? (g.h === team ? 'Joga em casa' : 'Joga fora de casa') + ' · ' + champName[g.c] : champName[g.c];
     var chans = g.tv ? g.tv.split(' / ') : [];
     var where = chans.length ? chans.map(function (c) {
       var k = TV[c];
-      return '<div class="where-main"><span class="where-tv">' + c + '</span>' + (k ? '<span class="chip' + (k.free ? ' free' : '') + '">' + k.kind + '</span>' : '') + '</div>' + (k && k.hint ? '<div class="where-hint">' + k.hint + '</div>' : '');
+      return '<div class="where-main"><span class="where-tv">' + esc(c) + '</span>' + (k ? '<span class="chip' + (k.free ? ' free' : '') + '">' + esc(k.kind) + '</span>' : '') + '</div>' + (k && k.hint ? '<div class="where-hint">' + k.hint + '</div>' : '');
     }).join('') : '<div class="where-main"><span class="where-tv">A confirmar</span></div>';
     var hint = chans.length > 1 ? 'Passa em mais de um canal: ele pode ver em qualquer um.' : chans.length ? '' : 'O canal ainda não foi informado para este jogo.';
     return '<article class="game' + (o.next ? ' next' : '') + '">' + (o.showDay ? whenLine(g, o.next ? 'PRÓXIMO JOGO · ' : '') : '') +
-      '<div class="row"><div>' + teams + '</div><div class="time">' + g.t.replace(':', 'h') + '</div></div>' +
-      '<div class="info"><div class="champ">' + info + '</div>' + (g.v ? '<div class="champ">Estádio: ' + g.v + '</div>' : '') + exChip(g) + '</div>' +
+      '<div class="row"><div>' + teams + '</div><div class="time">' + esc(g.t.replace(':', 'h')) + '</div></div>' +
+      '<div class="info"><div class="champ">' + info + '</div>' + (g.v ? '<div class="champ">Estádio: ' + esc(g.v) + '</div>' : '') + exChip(g) + '</div>' +
       '<div class="where"><div class="where-label">ONDE ASSISTIR</div>' + where +
       (hint ? '<div class="where-hint">' + hint + '</div>' : '') + '</div>' +
       '<a class="remind" href="' + calLink(g) + '" target="_blank" rel="noopener">Avisar 30 min antes</a></article>';
@@ -325,7 +332,7 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
   function resultCard(g, o) {
     o = o || {};
     var hw = g.s[0] > g.s[1], aw = g.s[1] > g.s[0];
-    var line = function (n, goals, w) { return '<div class="line' + (w ? ' win' : '') + '"><span class="team' + (n === team ? ' mine' : '') + '">' + n + '</span><span class="goals">' + goals + '</span></div>'; };
+    var line = function (n, goals, w) { return '<div class="line' + (w ? ' win' : '') + '"><span class="team' + (n === team ? ' mine' : '') + '">' + esc(n) + '</span><span class="goals">' + esc(goals) + '</span></div>'; };
     var chip = '';
     if (o.showDay && (g.h === team || g.a === team)) {
       var gf = g.h === team ? g.s[0] : g.s[1], ga = g.h === team ? g.s[1] : g.s[0];
@@ -336,8 +343,8 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
   }
 
   function newsCard(it) {
-    return '<article class="game"><div class="when">' + it.d + ' · Gazeta Esportiva</div><div class="news-title">' + it.t + '</div>' +
-      '<a class="remind" href="' + it.u + '" target="_blank" rel="noopener">Ler no site da Gazeta Esportiva</a></article>';
+    return '<article class="game"><div class="when">' + esc(it.d) + ' · Gazeta Esportiva</div><div class="news-title">' + esc(it.t) + '</div>' +
+      '<a class="remind" href="' + safeUrl(it.u) + '" target="_blank" rel="noopener">Ler no site da Gazeta Esportiva</a></article>';
   }
 
   function tableHtml() {
