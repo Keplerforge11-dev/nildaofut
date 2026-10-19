@@ -60,6 +60,19 @@ h1 { font-family: var(--font-display); font-size: 1.5rem; line-height: 1.15; tex
 h2.sec { font-family: var(--font-display); font-size: 1.05rem; margin: 0.4rem 0 0; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gold); }
 .lead { margin: 0.25rem 0 0; color: var(--muted); font-size: 1.05rem; }
 
+.seg.four button { font-size: 15px; padding: 0.2rem 0.1rem; }
+.vbtn { display: flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3.2rem; border-radius: 0.9rem; border: 2px solid var(--gold); background: var(--gold); color: var(--on-gold); font-weight: 700; font-size: 1.05rem; padding: 0.3rem 0.9rem; width: 100%; }
+.vbtn svg { width: 1.3rem; height: 1.3rem; flex: none; }
+.vtitle { font-weight: 700; font-size: 1.1rem; overflow-wrap: break-word; }
+#player { position: fixed; inset: 0; z-index: 30; background: rgba(0, 0, 0, 0.97); display: flex; flex-direction: column; justify-content: center; gap: 0.9rem; padding: 1rem max(16px, env(safe-area-inset-right, 0px)) 1rem max(16px, env(safe-area-inset-left, 0px)); }
+#player[hidden] { display: none; }
+#player .frame { position: relative; width: 100%; max-width: 900px; margin: 0 auto; aspect-ratio: 16 / 9; background: #000; border: 2px solid var(--gold); border-radius: 0.8rem; overflow: hidden; }
+#player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+#player .ptitle { max-width: 900px; margin: 0 auto; width: 100%; font-weight: 700; font-size: 1.05rem; color: var(--ink); overflow-wrap: break-word; }
+#player .pbar { max-width: 900px; margin: 0 auto; width: 100%; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+#player .pbar > * { flex: 1 1 10rem; min-height: 3.4rem; border-radius: 0.9rem; font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; justify-content: center; text-decoration: none; text-align: center; }
+#player .pclose { border: 0; background: var(--gold); color: var(--on-gold); }
+#player .pyt { border: 2px solid var(--gold); color: var(--gold); background: transparent; }
 .note { border: 2px dashed var(--line); border-radius: 0.75rem; padding: 0.7rem 0.9rem; color: var(--muted); font-size: 0.9rem; margin: 0; }
 
 .seg { display: flex; gap: 0.4rem; }
@@ -185,6 +198,11 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
   <button type="button" id="tabPick">Campeonatos</button>
 </nav>
 
+<div id="player" role="dialog" aria-modal="true" aria-label="Melhores momentos" hidden>
+  <div class="frame" id="pframe"></div>
+  <div class="ptitle" id="ptitle"></div>
+  <div class="pbar"><button class="pclose" id="pclose" type="button">Fechar vídeo</button><a class="pyt" id="pyt" href="#" target="_blank" rel="noopener">Abrir no YouTube</a></div>
+</div>
 <script>
 (function () {
   var CHAMPS = [
@@ -216,17 +234,19 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
     return Math.round((a - b) / 86400000);
   }
 
-  var DATA = SEED, TABLE = [], CLUBS = [], NEWS = {}, GAMES = [];
+  var DATA = SEED, TABLE = [], CLUBS = [], NEWS = {}, GAMES = [], VIDEOS = [];
   function applyData(d) {
     DATA = d;
     TABLE = d.table || [];
     CLUBS = TABLE.map(function (r) { return r[1]; }).sort(function (a, b) { return a.localeCompare(b, 'pt-BR'); });
+    VIDEOS = (d.videos || []).filter(function (v) { return /^[A-Za-z0-9_-]{11}$/.test(v.id); });
     NEWS = {};
     Object.keys(d.news || {}).forEach(function (k) { NEWS[k] = { source: 'Gazeta Esportiva', items: d.news[k] }; });
     GAMES = (d.games || []).map(function (x) {
       var g = { c: x.c, d: daysFrom(x.date), t: x.t, h: x.h, a: x.a, tv: x.tv || '', v: x.v || '' };
       if (x.s) g.s = x.s;
       if (x.tbc) g.tbc = true;
+      g.date = x.date;
       return g;
     });
     GAMES.sort(function (x, y) { return x.d - y.d || x.t.localeCompare(y.t); });
@@ -314,6 +334,33 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
     return /^https:\/\/(www\.)?gazetaesportiva\.com\//.test(u) ? esc(u) : 'https://www.gazetaesportiva.com/';
   }
 
+  var PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>';
+  function videoFor(g) {
+    if (!g.date) return null;
+    var t0 = new Date(g.date + 'T00:00:00').getTime(), t1 = t0 + 5 * 86400000;
+    return VIDEOS.filter(function (v) {
+      var t = new Date(v.d + 'T00:00:00').getTime();
+      return v.c && v.c.length === 2 && v.c.indexOf(g.h) > -1 && v.c.indexOf(g.a) > -1 && t >= t0 && t <= t1;
+    })[0] || null;
+  }
+  function videoBtn(v, label) {
+    return '<button class="vbtn" type="button" data-video="' + esc(v.id) + '">' + PLAY + '<span>' + esc(label) + '</span></button>';
+  }
+  function videoCard(v) {
+    var d = v.d.split('-');
+    return '<article class="game"><div class="when">' + d[2] + '/' + d[1] + '/' + d[0] + ' · ge tv</div><div class="vtitle">' + esc(v.t) + '</div>' + videoBtn(v, 'Assistir melhores momentos') + '</article>';
+  }
+  function openPlayer(id) {
+    if (!/^[A-Za-z0-9_-]{11}$/.test(id)) return;
+    var v = VIDEOS.filter(function (x) { return x.id === id; })[0];
+    $('ptitle').textContent = v ? v.t : '';
+    $('pframe').innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0&playsinline=1" title="Melhores momentos" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+    $('pyt').href = 'https://www.youtube.com/watch?v=' + id;
+    $('player').hidden = false;
+    $('pclose').focus();
+  }
+  function closePlayer() { $('pframe').innerHTML = ''; $('player').hidden = true; }
+
   function card(g, o) {
     o = o || {};
     var tv = TV[g.tv];
@@ -343,7 +390,7 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
       chip = gf > ga ? '<span class="chip free">Vitória</span>' : gf < ga ? '<span class="chip plain">Derrota</span>' : '<span class="chip">Empate</span>';
     }
     return '<article class="game">' + (o.showDay ? whenLine(g) : '') + line(g.h, g.s[0], hw) + line(g.a, g.s[1], aw) +
-      '<div class="where-main"><span class="champ">' + champName[g.c] + ' · jogo encerrado</span>' + chip + exChip(g) + '</div></article>';
+      '<div class="where-main"><span class="champ">' + champName[g.c] + ' · jogo encerrado</span>' + chip + exChip(g) + '</div>' + (function () { var v = videoFor(g); return v ? videoBtn(v, 'Assistir melhores momentos') : ''; })() + '</article>';
   }
 
   function newsCard(it) {
@@ -375,7 +422,7 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
     return last !== null ? html + '</section>' : html;
   }
   function seg(items, active, attr) {
-    return '<div class="seg" role="group">' + items.map(function (i) {
+    return '<div class="seg' + (items.length > 3 ? ' four' : '') + '" role="group">' + items.map(function (i) {
       return '<button type="button" ' + attr + '="' + i[0] + '" aria-pressed="' + (i[0] === active) + '">' + i[1] + '</button>';
     }).join('') + '</div>';
   }
@@ -431,7 +478,7 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
     var row = TABLE.filter(function (r) { return r[1] === team; })[0];
     var html = mascotHtml() + '<div><h1>Meu time</h1><div class="myteam">' + team + '</div>' + (row ? '<p class="lead">' + row[0] + 'º lugar no Brasileirão · ' + row[2] + ' pontos</p>' : '') + '</div>' +
       '<button class="cta ghost" type="button" data-change="1">Trocar de time</button>' +
-      seg([['games', 'Jogos'], ['results', 'Resultados'], ['news', 'Notícias']], teamTab, 'data-tab');
+      seg([['games', 'Jogos'], ['results', 'Placares'], ['news', 'Notícias'], ['videos', 'Vídeos']], teamTab, 'data-tab');
     var note = sampleNote();
     if (teamTab === 'games') {
       var up = mine.filter(function (g) { return !g.s && g.d >= 0; });
@@ -439,6 +486,10 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
     } else if (teamTab === 'results') {
       var past = mine.filter(function (g) { return g.s; }).sort(function (x, y) { return y.d - x.d; }).slice(0, 15);
       html += past.length ? '<div class="stack">' + past.map(function (g) { return resultCard(g, { showDay: true }); }).join('') + '</div>' : '<div class="empty"><p>Ainda não há placar do ' + team + ' nesta fonte. A página da Gazeta mostra só alguns placares da rodada.</p></div>';
+    } else if (teamTab === 'videos') {
+      var vs = VIDEOS.filter(function (v) { return v.c && v.c.indexOf(team) > -1; }).slice(0, 10);
+      html += vs.length ? '<h2 class="sec">Melhores momentos</h2><div class="stack">' + vs.map(videoCard).join('') + '</div>' : '<div class="empty"><p>Ainda não há vídeos do ' + esc(team) + ' por aqui. Eles aparecem sozinhos depois dos jogos.</p></div>';
+      note = 'Vídeos do canal ge tv, no YouTube. O vídeo toca aqui dentro do app e precisa de internet.' + (DATA.status && DATA.status.videos === 'ok' ? ' A lista se atualiza sozinha.' : '');
     } else {
       var nw = NEWS[team];
       if (!nw) {
@@ -478,8 +529,9 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
   $('tabPick').addEventListener('click', function () { show('pick'); });
   $('seeGames').addEventListener('click', function () { show('games'); });
   document.addEventListener('click', function (e) {
-    var t = e.target.closest('[data-go],[data-more],[data-change],[data-cancel],[data-tab],[data-gtab]');
+    var t = e.target.closest('[data-go],[data-more],[data-change],[data-cancel],[data-tab],[data-gtab],[data-video]');
     if (!t) return;
+    if (t.hasAttribute('data-video')) { openPlayer(t.getAttribute('data-video')); return; }
     if (t.hasAttribute('data-go')) show(t.getAttribute('data-go'));
     else if (t.hasAttribute('data-more')) { days += 7; renderGames(); }
     else if (t.hasAttribute('data-tab')) { teamTab = t.getAttribute('data-tab'); renderTeam(); }
@@ -498,6 +550,8 @@ nav button[aria-current="page"] { background: var(--gold); border-color: var(--g
     team = e.target.value; editingTeam = false; save('nf-team', team);
     renderTeam(); window.scrollTo(0, 0);
   });
+  $('pclose').addEventListener('click', closePlayer);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('player').hidden) closePlayer(); });
   $('sizeBtn').addEventListener('click', function () { sizeIdx = (sizeIdx + 1) % SIZES.length; save('nf-size', sizeIdx); applySize(); });
 
   applySize();

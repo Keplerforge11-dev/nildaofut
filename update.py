@@ -32,6 +32,9 @@ API = "https://api.football-data.org/v4/competitions/BSA"
 CLARO_URL = "https://www.claro.com.br/blog/tv/brasileirao"
 CLARO_BASE = "https://www.claro.com.br/blog/tv/"
 GAZETA = "https://www.gazetaesportiva.com/"
+YT_PLAYLIST = "PLZuM_Kl1KELkC-G1Vq0Rl172B4Y7Rlu64"  # melhores momentos do ge tv
+YT_FEED = "https://www.youtube.com/feeds/videos.xml?playlist_id=" + YT_PLAYLIST
+YT_MAX = 80
 COPAS = [
     ("sa-lib", GAZETA + "campeonatos/libertadores-da-america/"),
     ("sa-sul", GAZETA + "campeonatos/copa-sulamericana/"),
@@ -364,6 +367,44 @@ def buscar_noticias(antigas):
     return noticias
 
 
+# ---------- Melhores momentos: feed público da playlist do YouTube ----------
+NS_ATOM = "{http://www.w3.org/2005/Atom}"
+NS_YT = "{http://www.youtube.com/xml/schemas/2015}"
+RE_VIDEO_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
+
+
+def times_no_titulo(titulo):
+    """Times do app citados no título, na ordem em que aparecem (mandante primeiro)."""
+    n = norm(titulo)
+    achados = []
+    for app, kws in CLUBS:
+        pos = [m.start() for k in kws for m in re.finditer(r"\b" + re.escape(k) + r"\b", n)]
+        if pos:
+            achados.append((min(pos), app))
+    return [app for _, app in sorted(achados)]
+
+
+def buscar_videos(antigos):
+    corpo = get(YT_FEED)
+    guardar_copia("youtube-playlist.xml", corpo)
+    entradas = ET.fromstring(corpo.encode("utf-8")).findall(NS_ATOM + "entry")
+    if not entradas:
+        raise ValueError("feed da playlist vazio")
+    por_id = {v["id"]: v for v in antigos}
+    for e in entradas:
+        vid = (e.findtext(NS_YT + "videoId") or "").strip()
+        titulo = (e.findtext(NS_ATOM + "title") or "").strip()
+        pub = (e.findtext(NS_ATOM + "published") or "").strip()
+        if not RE_VIDEO_ID.match(vid) or not titulo:
+            continue
+        try:
+            dt = datetime.fromisoformat(pub.replace("Z", "+00:00")).astimezone(TZ)
+        except Exception:
+            dt = datetime.now(TZ)
+        por_id[vid] = {"id": vid, "t": titulo, "d": dt.strftime("%Y-%m-%d"), "c": times_no_titulo(titulo)[:2], "ts": int(dt.timestamp())}
+    return sorted(por_id.values(), key=lambda v: v["ts"], reverse=True)[:YT_MAX]
+
+
 def carregar():
     try:
         with open(DATA_FILE, encoding="utf-8") as f:
@@ -439,9 +480,17 @@ def main():
         status["noticias"] = "erro"
         aviso("notícias não atualizaram, mantive as antigas: %s" % e)
 
+    # Melhores momentos
+    try:
+        dados["videos"] = buscar_videos(antes.get("videos", []))
+        status["videos"] = "ok"
+    except Exception as e:
+        status["videos"] = "erro"
+        aviso("vídeos não atualizaram, mantive os antigos: %s" % e)
+
     dados["updated"] = datetime.now(TZ).isoformat(timespec="minutes")
     dados["status"] = status
-    ordem = ["updated", "status", "table", "games", "news"]
+    ordem = ["updated", "status", "table", "games", "news", "videos"]
     gravar({k: dados[k] for k in ordem if k in dados})
     print("pronto:", status, "| avisos:", len(avisos))
 
