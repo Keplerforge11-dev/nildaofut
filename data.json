@@ -1,5 +1,5 @@
 {
-"updated": "2026-10-19T18:07-03:00",
+"updated": "2026-10-19T18:38-03:00",
 "status": {"brasileirao": "ok", "canais": "ok", "copas": "ok", "noticias": "ok", "videos": "ok"},
 "table": [
 [1, "Flamengo", 67, 31, 20, 7, 4, 61, 25, 36],
@@ -335,7 +335,7 @@
 {"c": "br-a", "date": "2026-10-18", "t": "16:00", "h": "Fluminense", "a": "Santos", "tv": "Premiere", "v": "Maracanã", "s": [1, 2]},
 {"c": "br-a", "date": "2026-10-18", "t": "16:00", "h": "Grêmio", "a": "Cruzeiro", "tv": "Premiere", "v": "Arena do Grêmio", "s": [2, 4]},
 {"c": "br-a", "date": "2026-10-18", "t": "18:30", "h": "Bahia", "a": "Flamengo", "tv": "TV Globo / Premiere", "v": "Arena Fonte Nova", "s": [0, 3]},
-{"c": "br-a", "date": "2026-10-18", "t": "19:30", "h": "Remo", "a": "Red Bull Bragantino", "tv": "Premiere", "v": "Mangueirão", "s": [1, 1]},
+{"c": "br-a", "date": "2026-10-18", "t": "19:30", "h": "Remo", "a": "Red Bull Bragantino", "tv": "Premiere", "v": "Mangueirão"},
 {"c": "br-a", "date": "2026-10-19", "t": "20:00", "h": "Corinthians", "a": "Vitória", "tv": "Premiere", "v": "Neo Química Arena"},
 {"c": "sa-sul", "date": "2026-10-20", "t": "21:30", "h": "Vasco", "a": "Boca Juniors", "tv": "", "v": "Maracanã"},
 {"c": "sa-sul", "date": "2026-10-21", "t": "19:00", "h": "Montevideo City Torque", "a": "Atlético-MG", "tv": "", "v": "Centenário"},
@@ -357,10 +357,10 @@
 {"c": "br-a", "date": "2026-10-28", "t": "21:30", "h": "Bahia", "a": "São Paulo", "tv": "Premiere", "v": "Arena Fonte Nova"},
 {"c": "br-a", "date": "2026-10-28", "t": "21:30", "h": "Remo", "a": "Botafogo", "tv": "Premiere", "v": "Mangueirão"},
 {"c": "br-a", "date": "2026-10-29", "t": "19:30", "h": "Atlético-MG", "a": "Cruzeiro", "tv": "TV Globo / Premiere", "v": "Arena MRV"},
+{"c": "br-a", "date": "2026-10-29", "t": "19:30", "h": "Coritiba", "a": "Vitória", "tv": "Premiere", "v": "Couto Pereira"},
 {"c": "br-a", "date": "2026-10-29", "t": "20:00", "h": "Vasco", "a": "Flamengo", "tv": "TV Globo / Premiere", "v": "São Januário"},
 {"c": "br-a", "date": "2026-10-29", "t": "21:30", "h": "Grêmio", "a": "Athletico-PR", "tv": "Premiere", "v": "Arena do Grêmio"},
 {"c": "br-a", "date": "2026-10-30", "t": "20:00", "h": "Corinthians", "a": "Mirassol", "tv": "Premiere", "v": "Neo Química Arena"},
-{"c": "br-a", "date": "2026-10-31", "t": "16:00", "h": "Coritiba", "a": "Vitória", "tv": "Premiere", "v": "Couto Pereira"},
 {"c": "br-copa", "date": "2026-11-01", "t": "16:00", "h": "Palmeiras", "a": "Vasco", "tv": "", "v": "Nubank Parque"},
 {"c": "br-copa", "date": "2026-11-01", "t": "18:30", "h": "Grêmio", "a": "Atlético-MG", "tv": "", "v": "Arena do Grêmio"},
 {"c": "br-a", "date": "2026-11-02", "t": "20:00", "h": "Red Bull Bragantino", "a": "Santos", "tv": "Premiere", "v": "Nabizão"},
