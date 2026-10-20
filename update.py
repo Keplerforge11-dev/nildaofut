@@ -34,6 +34,7 @@ CLARO_BASE = "https://www.claro.com.br/blog/tv/"
 GAZETA = "https://www.gazetaesportiva.com/"
 YT_PLAYLIST = "PLZuM_Kl1KELkC-G1Vq0Rl172B4Y7Rlu64"  # melhores momentos do ge tv
 YT_FEED = "https://www.youtube.com/feeds/videos.xml?playlist_id=" + YT_PLAYLIST
+YT_CANAL_FEED = "https://www.youtube.com/feeds/videos.xml?channel_id=UCgCKagVhzGnZcuP9bSMgMCg"  # canal ge tv: pega vídeos que ainda não entraram na playlist
 YT_MAX = 80
 COPAS = [
     ("sa-lib", GAZETA + "campeonatos/libertadores-da-america/"),
@@ -459,6 +460,11 @@ def buscar_videos(antigos):
     except Exception as e:
         aviso("feed do YouTube falhou (%s); usei a página da playlist" % e)
         lidos = videos_da_pagina(por_id)
+    try:
+        extras = [x for x in videos_do_feed(get(YT_CANAL_FEED)) if "melhores momentos" in norm(x[1]) and times_no_titulo(x[1])]
+        lidos = list(lidos) + extras
+    except Exception as e:
+        print("AVISO: feed do canal ge tv não respondeu (%s)" % e)
     for vid, titulo, dt in lidos:
         if not RE_VIDEO_ID.match(vid) or not titulo:
             continue
