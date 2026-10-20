@@ -386,6 +386,15 @@ def times_no_titulo(titulo):
     return [app for _, app in sorted(achados)]
 
 
+COMPETICOES = ("brasileirao", "libertadores", "sul americana", "sudamericana", "copa do brasil")
+
+
+def e_futebol_do_app(titulo, times):
+    """Aceita o vídeo se citar os dois times ou uma competição do app (evita vôlei, basquete etc.)."""
+    n = norm(titulo)
+    return len(times) == 2 or any(c in n for c in COMPETICOES)
+
+
 def baixar_feed_youtube():
     """O feed do YouTube às vezes responde 404 por instantes; tenta de novo antes de desistir."""
     ultimo = None
@@ -471,7 +480,8 @@ def buscar_videos(antigos):
         if vid in por_id and "ts" in por_id[vid] and por_id[vid]["t"] == titulo:
             continue
         por_id[vid] = {"id": vid, "t": titulo, "d": dt.strftime("%Y-%m-%d"), "c": times_no_titulo(titulo)[:2], "ts": int(dt.timestamp())}
-    return sorted(por_id.values(), key=lambda v: v["ts"], reverse=True)[:YT_MAX]
+    validos = [v for v in por_id.values() if e_futebol_do_app(v["t"], v["c"])]
+    return sorted(validos, key=lambda v: v["ts"], reverse=True)[:YT_MAX]
 
 
 def carregar():
