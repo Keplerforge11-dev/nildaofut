@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icone-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&family=Playfair+Display:wght@700;800&display=swap">
 <style>
 body { margin: 0; }
 [hidden] { display: none !important; }
@@ -154,6 +154,46 @@ nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var
 nav button { flex: 1; min-width: 0; min-height: 64px; border-radius: 1rem; border: 2px solid var(--line); background: var(--bg); font-weight: 700; font-size: 16px; padding: 0.2rem 0.25rem; }
 nav button[aria-current="page"] { background: var(--gold); border-color: var(--gold); color: var(--on-gold); }
 @media (prefers-reduced-motion: no-preference) { .game, .pick { transition: border-color .15s, background .15s; } }
+
+/* ===== Acabamento preto e dourado: fundo texturizado, dourado metálico, bordas em degradê ===== */
+:root {
+  --gold-grad: linear-gradient(180deg, #FBE9A6 0%, #E3B948 40%, #B98622 74%, #EACB68 100%);
+  --edge: linear-gradient(135deg, #F7E3A0 0%, #A67A22 42%, #E9C96B 70%, #8F6416 100%);
+  --glass: linear-gradient(150deg, #211D15 0%, #0F0E0B 100%);
+  --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
+}
+body { background: #070706; }
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800' preserveAspectRatio='xMidYMid slice'%3E %3Cdefs%3E %3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23F6DE8B' stop-opacity='.0'/%3E%3Cstop offset='.5' stop-color='%23E2B33A' stop-opacity='.55'/%3E%3Cstop offset='1' stop-color='%239A6D1A' stop-opacity='.0'/%3E%3C/linearGradient%3E %3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .8 0 0 0 0 .7 0 0 0 0 .5 0 0 0 .55 -.18'/%3E%3C/filter%3E %3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='2.2'/%3E%3C/filter%3E %3C/defs%3E %3Crect width='400' height='800' filter='url(%23n)' opacity='.33'/%3E %3Cg fill='none' stroke='url(%23g)' stroke-width='1.1'%3E %3Cpath d='M-20 700 L230 360 L430 250'/%3E%3Cpath d='M420 80 L150 560 L-20 640'/%3E%3Cpath d='M60 -10 L-10 120'/%3E%3Cpath d='M430 520 L300 430 L210 800'/%3E%3Cpath d='M120 800 L330 520'/%3E%3Cpath d='M260 -10 L420 210'/%3E%3Cpath d='M-10 300 L140 190 L190 -10'/%3E %3C/g%3E %3Cg fill='%23F6DE8B'%3E %3Ccircle cx='338' cy='452' r='1.6' filter='url(%23b)'/%3E%3Ccircle cx='338' cy='452' r='.8'/%3E %3Ccircle cx='62' cy='590' r='1.4' filter='url(%23b)'/%3E%3Ccircle cx='62' cy='590' r='.7'/%3E %3Ccircle cx='376' cy='238' r='1.2' filter='url(%23b)'/%3E%3Ccircle cx='376' cy='238' r='.6'/%3E %3Ccircle cx='20' cy='430' r='1.2'/%3E%3Ccircle cx='305' cy='650' r='1'/%3E%3Ccircle cx='190' cy='710' r='.9'/%3E %3C/g%3E%3C/svg%3E") center / cover no-repeat, radial-gradient(ellipse at 88% 14%, rgba(226, 179, 58, 0.16), transparent 52%), radial-gradient(ellipse at 8% 78%, rgba(226, 179, 58, 0.09), transparent 55%), #070706; }
+
+h1, h2.sec, .logo, .myteam, .bubble b { font-family: var(--font-serif); font-weight: 800; font-variant-numeric: lining-nums; }
+h2.sec { text-transform: none; letter-spacing: 0; font-size: 1.5rem; }
+.logo { color: var(--ink); font-size: 1.9rem; letter-spacing: 0; }
+h1, h2.sec, .myteam, .logo span, .bubble b, .time, .pos, .pts b, .line.win .goals {
+  background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+.bubble b { font-size: 1.2rem; }
+.where-label, .chip:not(.free):not(.plain) { color: #EBC969; }
+
+.avatar { border: 4px solid transparent; background: url("nildao.png") 50% 9% / 130% auto no-repeat padding-box, var(--edge) border-box; box-shadow: inset 0 0 0 2px #1b1409, 0 0 16px rgba(226, 179, 58, 0.35); }
+header { border-bottom: 3px solid; border-image: linear-gradient(90deg, #8F6416, #F1D67F 25%, #B98622 60%, #F1D67F 85%, #8F6416) 1; }
+
+.size-btn, .seg button, .game, .bubble, .trow, .empty, .pick, .remind, .cta.ghost, .chip, .chosen li, nav button, #player .pyt {
+  border: 2px solid transparent; background: var(--glass) padding-box, var(--edge) border-box; }
+.game, .trow, .empty, .pick, .bubble { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); }
+.size-btn, .remind, .cta.ghost { color: #F1D67F; }
+.chip.plain { background: var(--glass) padding-box, linear-gradient(135deg, #5a5240, #2c281d) border-box; }
+.game.next, .trow.mine, .pick:has(input:checked) { border-width: 3px; background: linear-gradient(150deg, #2C2515 0%, #14110A 100%) padding-box, var(--edge) border-box; box-shadow: 0 0 20px rgba(226, 179, 58, 0.28), 0 8px 20px rgba(0, 0, 0, 0.5); }
+.bubble { border-radius: 1.1rem; }
+.bubble::before { background: #1a160f; border-left-color: #C99A2E; border-bottom-color: #C99A2E; }
+
+.seg button[aria-pressed="true"], nav button[aria-current="page"], .chip.free, .badge, .cta, .vbtn, #player .pclose {
+  background: linear-gradient(180deg, #F8E08F 0%, #E0B03C 52%, #B98622 100%); border: 2px solid #F3D77C; color: var(--on-gold); box-shadow: 0 0 14px rgba(226, 179, 58, 0.3); }
+.pick:has(input:checked) .box { background: var(--gold-grad); border-color: #F3D77C; }
+
+nav { background: linear-gradient(180deg, rgba(24, 21, 15, 0.97), rgba(7, 7, 6, 0.99)); border-top: 3px solid; border-image: linear-gradient(90deg, #8F6416, #F1D67F 25%, #B98622 60%, #F1D67F 85%, #8F6416) 1; }
+nav button { color: var(--ink); }
+nav button[aria-current="page"] { color: var(--on-gold); }
+.where { border-top: 2px solid rgba(226, 179, 58, 0.28); }
 </style>
 </head>
 <body>
