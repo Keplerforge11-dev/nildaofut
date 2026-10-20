@@ -375,12 +375,20 @@ nav button[aria-current="page"] { color: var(--on-gold); }
   }
 
   var PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>';
+  function dayMs(d) { return new Date(d + 'T00:00:00').getTime(); }
   function videoFor(g) {
     if (!g.date) return null;
-    var t0 = new Date(g.date + 'T00:00:00').getTime(), t1 = t0 + 5 * 86400000;
+    var t0 = dayMs(g.date), t1 = t0 + 5 * 86400000;
+    var inWindow = function (v) { var t = dayMs(v.d); return t >= t0 && t <= t1; };
+    // 1) título com os dois times
+    var exact = VIDEOS.filter(function (v) { return v.c && v.c.length === 2 && v.c.indexOf(g.h) > -1 && v.c.indexOf(g.a) > -1 && inWindow(v); })[0];
+    if (exact) return exact;
+    // 2) título só com um time (ex.: "CORINTHIANS | MELHORES MOMENTOS"): vale se este foi o último jogo dele antes do vídeo
     return VIDEOS.filter(function (v) {
-      var t = new Date(v.d + 'T00:00:00').getTime();
-      return v.c && v.c.length === 2 && v.c.indexOf(g.h) > -1 && v.c.indexOf(g.a) > -1 && t >= t0 && t <= t1;
+      if (!v.c || v.c.length !== 1 || (v.c[0] !== g.h && v.c[0] !== g.a) || !inWindow(v)) return false;
+      var last = GAMES.filter(function (x) { return x.s && x.date && (x.h === v.c[0] || x.a === v.c[0]) && dayMs(x.date) <= dayMs(v.d); })
+        .sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; })[0];
+      return last === g;
     })[0] || null;
   }
   function videoBtn(v, label) {

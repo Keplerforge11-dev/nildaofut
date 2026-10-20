@@ -341,6 +341,7 @@ def buscar_noticias(antigas):
             corpo = get("%stimes/%s/feed/" % (GAZETA, slug))
             if clube == "Santos":
                 guardar_copia("feed-santos.xml", corpo)
+            corpo = re.sub(r"&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)", "&amp;", corpo)
             itens = list(ET.fromstring(corpo.encode("utf-8")).iter("item"))
             if not itens:
                 raise ValueError("feed vazio")
@@ -384,23 +385,85 @@ def times_no_titulo(titulo):
     return [app for _, app in sorted(achados)]
 
 
-def buscar_videos(antigos):
-    corpo = get(YT_FEED)
-    guardar_copia("youtube-playlist.xml", corpo)
-    entradas = ET.fromstring(corpo.encode("utf-8")).findall(NS_ATOM + "entry")
-    if not entradas:
-        raise ValueError("feed da playlist vazio")
-    por_id = {v["id"]: v for v in antigos}
-    for e in entradas:
+def baixar_feed_youtube():
+    """O feed do YouTube às vezes responde 404 por instantes; tenta de novo antes de desistir."""
+    ultimo = None
+    for espera in (0, 4, 10):
+        time.sleep(espera)
+        try:
+            return get(YT_FEED)
+        except Exception as e:
+            ultimo = e
+    raise ultimo
+
+
+def videos_do_feed(corpo):
+    saida = []
+    for e in ET.fromstring(corpo.encode("utf-8")).findall(NS_ATOM + "entry"):
         vid = (e.findtext(NS_YT + "videoId") or "").strip()
         titulo = (e.findtext(NS_ATOM + "title") or "").strip()
         pub = (e.findtext(NS_ATOM + "published") or "").strip()
-        if not RE_VIDEO_ID.match(vid) or not titulo:
-            continue
         try:
             dt = datetime.fromisoformat(pub.replace("Z", "+00:00")).astimezone(TZ)
         except Exception:
             dt = datetime.now(TZ)
+        saida.append((vid, titulo, dt))
+    return saida
+
+
+def videos_da_pagina(conhecidos):
+    """Plano B: lê a página da playlist. Não traz a data, então vídeo novo recebe a data de hoje."""
+    corpo = get("https://www.youtube.com/playlist?list=%s&hl=pt-BR" % YT_PLAYLIST,
+                {"Cookie": "CONSENT=YES+1; SOCS=CAI"})
+    guardar_copia("youtube-playlist.html", corpo)
+    m = re.search(r"ytInitialData\s*=\s*(\{.*?\});\s*</script>", corpo, re.S)
+    if not m:
+        raise ValueError("página da playlist sem dados")
+    achados = []
+
+    def andar(x):
+        if isinstance(x, dict):
+            r = x.get("playlistVideoRenderer")
+            if isinstance(r, dict) and r.get("videoId"):
+                runs = (r.get("title") or {}).get("runs") or []
+                achados.append((r["videoId"], "".join(t.get("text", "") for t in runs)))
+            for v in x.values():
+                andar(v)
+        elif isinstance(x, list):
+            for v in x:
+                andar(v)
+
+    andar(json.loads(m.group(1)))
+    if not achados:
+        raise ValueError("nenhum vídeo na página da playlist")
+    hoje = datetime.now(TZ)
+    novos = 0
+    saida = []
+    for vid, titulo in achados:
+        if vid not in conhecidos:
+            novos += 1
+            if novos > 10:  # só os primeiros: a playlist mostra os mais novos no topo
+                continue
+        saida.append((vid, titulo, hoje))
+    return saida
+
+
+def buscar_videos(antigos):
+    por_id = {v["id"]: v for v in antigos}
+    try:
+        corpo = baixar_feed_youtube()
+        guardar_copia("youtube-playlist.xml", corpo)
+        lidos = videos_do_feed(corpo)
+        if not lidos:
+            raise ValueError("feed da playlist vazio")
+    except Exception as e:
+        aviso("feed do YouTube falhou (%s); usei a página da playlist" % e)
+        lidos = videos_da_pagina(por_id)
+    for vid, titulo, dt in lidos:
+        if not RE_VIDEO_ID.match(vid) or not titulo:
+            continue
+        if vid in por_id and "ts" in por_id[vid] and por_id[vid]["t"] == titulo:
+            continue
         por_id[vid] = {"id": vid, "t": titulo, "d": dt.strftime("%Y-%m-%d"), "c": times_no_titulo(titulo)[:2], "ts": int(dt.timestamp())}
     return sorted(por_id.values(), key=lambda v: v["ts"], reverse=True)[:YT_MAX]
 
