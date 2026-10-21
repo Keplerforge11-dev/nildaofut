@@ -386,12 +386,15 @@ def times_no_titulo(titulo):
     return [app for _, app in sorted(achados)]
 
 
+OUTROS_ESPORTES_E_CATEGORIAS = ("feminin", "sub 20", "sub 17", "sub 15", "futsal", "volei", "basquete", "superliga", "nbb", "libertadores feminina")
 COMPETICOES = ("brasileirao", "libertadores", "sul americana", "sudamericana", "copa do brasil")
 
 
 def e_futebol_do_app(titulo, times):
     """Aceita o vídeo se citar os dois times ou uma competição do app (evita vôlei, basquete etc.)."""
     n = norm(titulo)
+    if any(x in n for x in OUTROS_ESPORTES_E_CATEGORIAS):
+        return False
     return len(times) == 2 or any(c in n for c in COMPETICOES)
 
 
@@ -503,6 +506,35 @@ def gravar(d):
         f.write("{\n" + ",\n".join(partes) + "\n}\n")
 
 
+def aplicar_ajustes(dados):
+    """Complementos escritos à mão em ajustes.json. Só preenchem o que as fontes automáticas deixaram vazio."""
+    if not os.path.exists("ajustes.json"):
+        return
+    try:
+        with open("ajustes.json", encoding="utf-8") as f:
+            aj = json.load(f)
+    except Exception as e:
+        aviso("ajustes.json ilegível: %s" % e)
+        return
+    jogos = {(g["date"], g["h"], g["a"]): g for g in dados.get("games", [])}
+    for a in aj.get("jogos", []):
+        g = jogos.get((a.get("date"), a.get("h"), a.get("a")))
+        if not g:
+            print("AVISO: ajuste sem jogo correspondente:", a.get("h"), "x", a.get("a"))
+            continue
+        if a.get("s") and not g.get("s"):
+            g["s"] = a["s"]
+        if a.get("tv") and not g.get("tv"):
+            g["tv"] = a["tv"]
+    por_id = {v["id"]: v for v in dados.get("videos", [])}
+    for v in aj.get("videos", []):
+        if RE_VIDEO_ID.match(v.get("id", "")) and v.get("t"):
+            ts = int(datetime.strptime(v["d"], "%Y-%m-%d").replace(hour=12, tzinfo=TZ).timestamp())
+            por_id[v["id"]] = {"id": v["id"], "t": v["t"], "d": v["d"], "c": v.get("c", []), "ts": ts}
+    if por_id:
+        dados["videos"] = sorted(por_id.values(), key=lambda v: v["ts"], reverse=True)[:YT_MAX]
+
+
 def main():
     antes = carregar()
     dados = dict(antes)
@@ -566,6 +598,8 @@ def main():
     except Exception as e:
         status["videos"] = "erro"
         aviso("vídeos não atualizaram, mantive os antigos: %s" % e)
+
+    aplicar_ajustes(dados)
 
     dados["updated"] = datetime.now(TZ).isoformat(timespec="minutes")
     dados["status"] = status

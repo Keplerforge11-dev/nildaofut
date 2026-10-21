@@ -1,0 +1,11 @@
+{
+  "jogos": [
+    {"date": "2026-10-20", "h": "Vasco", "a": "Boca Juniors", "s": [1, 3]},
+    {"date": "2026-10-21", "h": "Montevideo City Torque", "a": "Atlético-MG", "tv": "Canal GOAT / Disney+ / SKY+"},
+    {"date": "2026-10-21", "h": "Palmeiras", "a": "Fluminense", "tv": "Canal GOAT / SKY+"},
+    {"date": "2026-10-22", "h": "Flamengo", "a": "Estudiantes", "tv": "Canal GOAT / Disney+ / SKY+"}
+  ],
+  "videos": [
+    {"id": "ZZIBa1lzs7A", "t": "VASCO 1 X 3 BOCA JUNIORS | MELHORES MOMENTOS | SUL-AMERICANA 2026", "d": "2026-10-20", "c": ["Vasco", "Boca Juniors"]}
+  ]
+}
