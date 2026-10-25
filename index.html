@@ -194,6 +194,40 @@ nav { background: linear-gradient(180deg, rgba(24, 21, 15, 0.97), rgba(7, 7, 6, 
 nav button { color: var(--ink); }
 nav button[aria-current="page"] { color: var(--on-gold); }
 .where { border-top: 2px solid rgba(226, 179, 58, 0.28); }
+
+/* ===== Palpites: grupos, ranking e comentários ===== */
+nav { gap: 4px; padding-left: 8px; padding-right: 8px; }
+nav button { flex: 1 1 auto; font-size: 15px; padding: 0.2rem 0.3rem; white-space: nowrap; }
+.bet-row .team { overflow-wrap: normal; font-size: 1.2rem; }
+.field { display: flex; flex-direction: column; gap: 0.4rem; }
+.field label { font-weight: 700; font-size: 1.1rem; color: var(--gold-hi); }
+.input { width: 100%; box-sizing: border-box; min-height: 3.6rem; padding: 0.6rem 0.9rem; font: inherit; font-size: 1.3rem; color: var(--ink); background: var(--bg); border: 3px solid var(--muted); border-radius: 0.9rem; }
+textarea.input { min-height: 6.5rem; resize: vertical; line-height: 1.35; }
+.input:focus { outline: 4px solid var(--gold-hi); outline-offset: 2px; border-color: var(--gold); }
+.input.code { text-align: center; font-family: var(--font-display); font-size: 2rem; letter-spacing: 0.35em; text-transform: uppercase; }
+.help { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.err { margin: 0; padding: 0.7rem 0.9rem; border: 3px solid #E5736A; border-radius: 0.8rem; background: #2A1210; color: #FFD9D4; font-weight: 700; }
+.okmsg { margin: 0; padding: 0.7rem 0.9rem; border: 3px solid var(--gold); border-radius: 0.8rem; background: #1F1A0B; color: var(--gold-hi); font-weight: 700; }
+a.cta { display: flex; align-items: center; justify-content: center; text-align: center; text-decoration: none; box-sizing: border-box; }
+.cta { width: 100%; box-sizing: border-box; }
+.cta:disabled { opacity: 0.55; cursor: progress; }
+.cta[aria-disabled="true"] { cursor: default; }
+.cta.mini { min-height: 3rem; padding: 0.3rem 1rem; font-size: 1rem; width: auto; align-self: flex-start; }
+.cta.danger { color: #FFB4AC; }
+.mypos { font-size: 1.1rem; }
+.mypos b { color: var(--gold-hi); }
+.codebox { align-items: center; text-align: center; }
+.codebig { font-family: var(--font-display); font-size: 2.6rem; letter-spacing: 0.3em; padding-left: 0.3em; color: var(--gold-hi); }
+.cmt-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem 0.7rem; }
+.cmt-head .champ { margin-left: auto; }
+.cmt-body { font-size: 1.2rem; overflow-wrap: anywhere; white-space: pre-wrap; }
+.bet-row { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; }
+.bet-row .team { flex: 1 1 auto; min-width: 0; }
+.step { display: flex; align-items: center; gap: 0.3rem; flex: none; }
+.stepbtn { width: 3.2rem; height: 3.2rem; border-radius: 0.9rem; border: 2px solid #F3D77C; background: var(--gold-grad); color: var(--on-gold); font-family: var(--font-display); font-size: 2rem; line-height: 1; display: grid; place-items: center; padding: 0; }
+.stepbtn:active { filter: brightness(0.9); }
+.stepval { min-width: 1.8rem; text-align: center; font-family: var(--font-display); font-size: 2.1rem; color: var(--gold-hi); font-variant-numeric: tabular-nums; }
+.pool-wrap { display: flex; flex-direction: column; gap: 1rem; }
 </style>
 </head>
 <body>
@@ -220,6 +254,10 @@ nav button[aria-current="page"] { color: var(--on-gold); }
     <div class="wrap" id="teamBody"></div>
   </main>
 
+  <main id="screenPool" hidden>
+    <div class="wrap" id="poolBody"></div>
+  </main>
+
   <main id="screenPick" hidden>
     <div class="wrap">
       <div>
@@ -235,6 +273,7 @@ nav button[aria-current="page"] { color: var(--on-gold); }
 <nav aria-label="Menu principal">
   <button type="button" id="tabGames" aria-current="page">Jogos</button>
   <button type="button" id="tabTeam">Meu time</button>
+  <button type="button" id="tabPool">Palpites</button>
   <button type="button" id="tabPick">Campeonatos</button>
 </nav>
 
@@ -243,6 +282,8 @@ nav button[aria-current="page"] { color: var(--on-gold); }
   <div class="ptitle" id="ptitle"></div>
   <div class="pbar"><button class="pclose" id="pclose" type="button">Fechar vídeo</button><a class="pyt" id="pyt" href="#" target="_blank" rel="noopener">Abrir no YouTube</a></div>
 </div>
+<script src="supabase.js"></script>
+<script src="palpites.js"></script>
 <script>
 (function () {
   var CHAMPS = [
@@ -564,7 +605,11 @@ nav button[aria-current="page"] { color: var(--on-gold); }
     }).join('');
   }
 
-  var SCREENS = { games: ['screenGames', 'tabGames', renderGames], team: ['screenTeam', 'tabTeam', renderTeam], pick: ['screenPick', 'tabPick', renderPick] };
+  function renderPool() {
+    if (window.NFPool) window.NFPool.render($('poolBody'), { champName: champName });
+    else $('poolBody').innerHTML = '<div class="empty"><p>Não consegui abrir o ranking agora. Confira a internet e abra o app de novo.</p></div>';
+  }
+  var SCREENS = { games: ['screenGames', 'tabGames', renderGames], team: ['screenTeam', 'tabTeam', renderTeam], pool: ['screenPool', 'tabPool', renderPool], pick: ['screenPick', 'tabPick', renderPick] };
   function show(which) {
     Object.keys(SCREENS).forEach(function (k) {
       var on = k === which;
@@ -577,6 +622,7 @@ nav button[aria-current="page"] { color: var(--on-gold); }
 
   $('tabGames').addEventListener('click', function () { show('games'); });
   $('tabTeam').addEventListener('click', function () { editingTeam = false; show('team'); });
+  $('tabPool').addEventListener('click', function () { show('pool'); });
   $('tabPick').addEventListener('click', function () { show('pick'); });
   $('seeGames').addEventListener('click', function () { show('games'); });
   document.addEventListener('click', function (e) {
@@ -612,8 +658,8 @@ nav button[aria-current="page"] { color: var(--on-gold); }
       if (!d || !d.games || !d.table || !d.table.length) return;
       applyData(d);
       if (team && CLUBS.indexOf(team) < 0) team = '';
-      var cur = ['games', 'team', 'pick'].filter(function (k) { return !$(SCREENS[k][0]).hidden; })[0] || 'games';
-      SCREENS[cur][2]();
+      var cur = ['games', 'team', 'pool', 'pick'].filter(function (k) { return !$(SCREENS[k][0]).hidden; })[0] || 'games';
+      if (cur !== 'pool') SCREENS[cur][2]();
     }).catch(function () {});
   } catch (e) {}
   try { if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js'); } catch (e) {}

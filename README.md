@@ -12,3 +12,13 @@ preto e dourado, e o Nildão para dar boas-vindas.
 
 A chave da football-data.org fica em *Settings > Secrets and variables > Actions* com o nome `FOOTBALL_DATA_KEY`.
 Nunca coloque a chave dentro dos arquivos.
+
+## Ranking de palpites (Supabase gratuito)
+
+- `supabase/schema.sql`: cria as tabelas e as regras no Supabase. Cole no *SQL Editor* e clique em Run (pode rodar de novo sem problema)
+- `palpites.js`: as telas (Primeiro acesso, Meus grupos, Ranking, Palpites, Comentários, Criar grupo, Entrar com código)
+- `supabase.js`: biblioteca oficial do Supabase, guardada aqui para o app não depender de outro site
+- `sync_supabase.py`: o robô envia os jogos e placares do `data.json` para o Supabase. Quando um jogo termina, o ranking atualiza sozinho
+
+A chave **pública** (anon) fica em `palpites.js`: ela pode ficar no código, quem protege os dados são as regras do `schema.sql`.
+A chave **service_role** fica só em *Settings > Secrets and variables > Actions* com o nome `SUPABASE_SERVICE_KEY`.
