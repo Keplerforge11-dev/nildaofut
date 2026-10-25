@@ -1,5 +1,5 @@
 {
-"updated": "2026-10-25T16:08-03:00",
+"updated": "2026-10-25T16:56-03:00",
 "status": {"brasileirao": "ok", "canais": "ok", "copas": "ok", "noticias": "ok", "videos": "ok"},
 "table": [
 [1, "Palmeiras", 69, 32, 20, 9, 3, 56, 22, 34],
@@ -347,8 +347,8 @@
 {"c": "br-a", "date": "2026-10-24", "t": "16:30", "h": "Vitória", "a": "Athletico-PR", "tv": "Premiere", "v": "Barradão", "s": [1, 1]},
 {"c": "br-a", "date": "2026-10-24", "t": "18:30", "h": "Palmeiras", "a": "Red Bull Bragantino", "tv": "Premiere", "v": "Allianz Parque", "s": [2, 0]},
 {"c": "br-a", "date": "2026-10-24", "t": "18:30", "h": "Vasco", "a": "Corinthians", "tv": "TV Globo / Premiere", "v": "São Januário", "s": [3, 2]},
-{"c": "br-a", "date": "2026-10-24", "t": "19:30", "h": "Chapecoense", "a": "Fluminense", "tv": "Premiere", "v": "Arena Condá"},
-{"c": "br-a", "date": "2026-10-24", "t": "22:00", "h": "Santos", "a": "Bahia", "tv": "Premiere", "v": "Vila Belmiro"},
+{"c": "br-a", "date": "2026-10-24", "t": "19:30", "h": "Chapecoense", "a": "Fluminense", "tv": "Premiere", "v": "Arena Condá", "s": [2, 1]},
+{"c": "br-a", "date": "2026-10-24", "t": "22:00", "h": "Santos", "a": "Bahia", "tv": "Premiere", "v": "Vila Belmiro", "s": [1, 1]},
 {"c": "br-a", "date": "2026-10-26", "t": "19:30", "h": "Coritiba", "a": "Grêmio", "tv": "Premiere", "v": "Couto Pereira"},
 {"c": "br-a", "date": "2026-10-26", "t": "20:00", "h": "Flamengo", "a": "Atlético-MG", "tv": "TV Globo / Premiere", "v": "Maracanã"},
 {"c": "br-a", "date": "2026-10-28", "t": "19:30", "h": "Red Bull Bragantino", "a": "Chapecoense", "tv": "Premiere", "v": "Nabizão"},
