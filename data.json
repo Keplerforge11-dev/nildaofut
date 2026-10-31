@@ -1,5 +1,5 @@
 {
-"updated": "2026-10-30T21:58-03:00",
+"updated": "2026-10-30T22:57-03:00",
 "status": {"brasileirao": "ok", "canais": "ok", "copas": "ok", "noticias": "ok", "videos": "erro"},
 "table": [
 [1, "Flamengo", 73, 33, 22, 7, 4, 68, 28, 40],
@@ -359,7 +359,7 @@
 {"c": "br-a", "date": "2026-10-29", "t": "19:30", "h": "Atlético-MG", "a": "Cruzeiro", "tv": "TV Globo / Premiere", "v": "Arena MRV", "s": [0, 1]},
 {"c": "br-a", "date": "2026-10-29", "t": "20:00", "h": "Vasco", "a": "Flamengo", "tv": "TV Globo / Premiere", "v": "São Januário", "s": [1, 4]},
 {"c": "br-a", "date": "2026-10-29", "t": "21:30", "h": "Grêmio", "a": "Athletico-PR", "tv": "Premiere", "v": "Arena do Grêmio", "s": [2, 0]},
-{"c": "br-a", "date": "2026-10-30", "t": "20:00", "h": "Corinthians", "a": "Mirassol", "tv": "Premiere", "v": "Neo Química Arena"},
+{"c": "br-a", "date": "2026-10-30", "t": "20:00", "h": "Corinthians", "a": "Mirassol", "tv": "Premiere", "v": "Neo Química Arena", "s": [2, 0]},
 {"c": "br-a", "date": "2026-10-31", "t": "16:00", "h": "Coritiba", "a": "Vitória", "tv": "Premiere", "v": "Couto Pereira"},
 {"c": "br-copa", "date": "2026-11-01", "t": "16:00", "h": "Palmeiras", "a": "Vasco", "tv": "", "v": "Nubank Parque"},
 {"c": "br-copa", "date": "2026-11-01", "t": "18:30", "h": "Grêmio", "a": "Atlético-MG", "tv": "", "v": "Arena do Grêmio"},
