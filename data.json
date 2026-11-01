@@ -1,5 +1,5 @@
 {
-"updated": "2026-11-01T13:39-03:00",
+"updated": "2026-11-01T14:36-03:00",
 "status": {"brasileirao": "ok", "canais": "ok", "copas": "ok", "noticias": "ok", "videos": "ok"},
 "table": [
 [1, "Flamengo", 73, 33, 22, 7, 4, 68, 28, 40],
@@ -376,7 +376,6 @@
 {"c": "br-copa", "date": "2026-11-07", "t": "18:00", "h": "Atlético-MG", "a": "Grêmio", "tv": "", "v": "Arena MRV"},
 {"c": "br-copa", "date": "2026-11-08", "t": "17:00", "h": "Vasco", "a": "Palmeiras", "tv": "", "v": "São Januário"},
 {"c": "br-a", "date": "2026-11-14", "t": "18:30", "h": "Mirassol", "a": "Atlético-MG", "tv": "Premiere", "v": "Maião"},
-{"c": "br-a", "date": "2026-11-14", "t": "20:30", "h": "Chapecoense", "a": "Vasco", "tv": "", "v": ""},
 {"c": "br-a", "date": "2026-11-18", "t": "19:30", "h": "Coritiba", "a": "Santos", "tv": "Premiere", "v": "Couto Pereira"},
 {"c": "br-a", "date": "2026-11-18", "t": "20:00", "h": "Remo", "a": "Chapecoense", "tv": "Premiere", "v": "Mangueirão"},
 {"c": "br-a", "date": "2026-11-18", "t": "20:30", "h": "Cruzeiro", "a": "Palmeiras", "tv": "TV Globo / Premiere", "v": "Mineirão"},
