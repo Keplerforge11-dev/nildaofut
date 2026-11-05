@@ -1,5 +1,5 @@
 {
-"updated": "2026-11-05T13:39-03:00",
+"updated": "2026-11-05T14:56-03:00",
 "status": {"brasileirao": "ok", "canais": "ok", "copas": "ok", "noticias": "ok", "videos": "ok"},
 "table": [
 [1, "Flamengo", 76, 34, 23, 7, 4, 71, 29, 42],
@@ -368,8 +368,8 @@
 {"c": "br-a", "date": "2026-11-03", "t": "21:30", "h": "Internacional", "a": "Coritiba", "tv": "Premiere", "v": "Beira-Rio", "s": [1, 0]},
 {"c": "br-a", "date": "2026-11-04", "t": "19:30", "h": "Athletico-PR", "a": "Vasco", "tv": "CazéTV / Premiere", "v": "Ligga Arena", "s": [1, 3]},
 {"c": "br-a", "date": "2026-11-04", "t": "19:30", "h": "Flamengo", "a": "Grêmio", "tv": "TV Globo / Premiere", "v": "Maracanã", "s": [3, 1]},
-{"c": "br-a", "date": "2026-11-04", "t": "21:30", "h": "Botafogo", "a": "Atlético-MG", "tv": "SporTV / Premiere", "v": "Nilton Santos", "s": [1, 0]},
-{"c": "br-a", "date": "2026-11-04", "t": "21:30", "h": "São Paulo", "a": "Corinthians", "tv": "TV Globo / Premiere", "v": "MorumBIS", "s": [0, 0]},
+{"c": "br-a", "date": "2026-11-04", "t": "21:30", "h": "Botafogo", "a": "Atlético-MG", "tv": "SporTV / Premiere", "v": "Nilton Santos"},
+{"c": "br-a", "date": "2026-11-04", "t": "21:30", "h": "São Paulo", "a": "Corinthians", "tv": "TV Globo / Premiere", "v": "MorumBIS"},
 {"c": "br-a", "date": "2026-11-05", "t": "19:30", "h": "Palmeiras", "a": "Remo", "tv": "Premiere", "v": "Allianz Parque"},
 {"c": "br-a", "date": "2026-11-05", "t": "21:30", "h": "Cruzeiro", "a": "Bahia", "tv": "Premiere", "v": "Mineirão"},
 {"c": "br-a", "date": "2026-11-06", "t": "20:00", "h": "Vitória", "a": "Fluminense", "tv": "Premiere", "v": "Barradão"},
