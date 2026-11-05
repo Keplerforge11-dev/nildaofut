@@ -1,5 +1,5 @@
 {
-"updated": "2026-11-05T11:35-03:00",
+"updated": "2026-11-05T12:32-03:00",
 "status": {"brasileirao": "ok", "canais": "ok", "copas": "ok", "noticias": "ok", "videos": "ok"},
 "table": [
 [1, "Flamengo", 76, 34, 23, 7, 4, 71, 29, 42],
@@ -361,8 +361,8 @@
 {"c": "br-a", "date": "2026-10-29", "t": "21:30", "h": "Grêmio", "a": "Athletico-PR", "tv": "Premiere", "v": "Arena do Grêmio", "s": [2, 0]},
 {"c": "br-a", "date": "2026-10-30", "t": "20:00", "h": "Corinthians", "a": "Mirassol", "tv": "Premiere", "v": "Neo Química Arena", "s": [2, 0]},
 {"c": "br-a", "date": "2026-10-31", "t": "16:00", "h": "Coritiba", "a": "Vitória", "tv": "Premiere", "v": "Couto Pereira", "s": [2, 0]},
-{"c": "br-copa", "date": "2026-11-01", "t": "16:00", "h": "Palmeiras", "a": "Vasco", "tv": "", "v": "Nubank Parque"},
-{"c": "br-copa", "date": "2026-11-01", "t": "18:30", "h": "Grêmio", "a": "Atlético-MG", "tv": "", "v": "Arena do Grêmio"},
+{"c": "br-copa", "date": "2026-11-01", "t": "16:00", "h": "Palmeiras", "a": "Vasco", "tv": "", "v": "Nubank Parque", "s": [1, 0]},
+{"c": "br-copa", "date": "2026-11-01", "t": "18:30", "h": "Grêmio", "a": "Atlético-MG", "tv": "", "v": "Arena do Grêmio", "s": [2, 0]},
 {"c": "br-a", "date": "2026-11-02", "t": "20:00", "h": "Red Bull Bragantino", "a": "Santos", "tv": "Premiere", "v": "Nabizão", "s": [2, 1]},
 {"c": "br-a", "date": "2026-11-03", "t": "19:30", "h": "Chapecoense", "a": "Mirassol", "tv": "Premiere", "v": "Arena Condá", "s": [1, 2]},
 {"c": "br-a", "date": "2026-11-03", "t": "21:30", "h": "Internacional", "a": "Coritiba", "tv": "Premiere", "v": "Beira-Rio", "s": [1, 0]},
