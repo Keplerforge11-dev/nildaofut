@@ -1,6 +1,6 @@
 {
-"updated": "2026-11-11T21:27-03:00",
-"status": {"brasileirao": "ok", "canais": "ok", "copas": "ok", "noticias": "ok", "videos": "ok"},
+"updated": "2026-11-11T22:53-03:00",
+"status": {"brasileirao": "ok", "canais": "ok", "copas": "ok", "noticias": "ok", "videos": "erro"},
 "table": [
 [1, "Flamengo", 76, 34, 23, 7, 4, 71, 29, 42],
 [2, "Palmeiras", 73, 34, 21, 10, 3, 62, 23, 39],
